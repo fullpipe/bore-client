@@ -1,0 +1,7 @@
+{
+  "name": "bore",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
