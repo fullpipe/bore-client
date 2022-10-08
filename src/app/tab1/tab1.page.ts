@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { BooksGQL, BooksQuery } from 'src/generated/graphql';
+import { PlayerService } from '../service/player.service';
 
 @Component({
   selector: 'app-tab1',
@@ -9,10 +7,9 @@ import { BooksGQL, BooksQuery } from 'src/generated/graphql';
   styleUrls: ['tab1.page.scss'],
 })
 export class Tab1Page {
-  books: Observable<BooksQuery['books']>;
-  constructor(private booksGql: BooksGQL) {
-    this.books = booksGql
-      .watch()
-      .valueChanges.pipe(map((result) => result.data.books));
+  constructor(private player: PlayerService) {}
+
+  play(id: number) {
+    this.player.play(id);
   }
 }

@@ -13,6 +13,14 @@ const config: CodegenConfig = {
       ],
     },
   },
+  config: {
+    scalars: {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Uint: 'number',
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      ID: 'number',
+    },
+  },
 };
 
 export default config;

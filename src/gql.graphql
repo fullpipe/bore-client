@@ -6,3 +6,18 @@ query books {
     reader
   }
 }
+
+query book($id: ID!) {
+  book(id: $id) {
+    id
+    title
+    author
+    reader
+
+    parts {
+      title
+      possition
+      path
+    }
+  }
+}

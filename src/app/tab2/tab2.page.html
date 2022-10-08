@@ -1,8 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Tab 2
-    </ion-title>
+    <ion-title> Tab 2 </ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -13,5 +11,16 @@
     </ion-toolbar>
   </ion-header>
 
-  <app-explore-container name="Tab 2 page"></app-explore-container>
+  <ion-card *ngFor="let book of books | async">
+    <ion-card-header>
+      <ion-card-subtitle>{{ book.author }}</ion-card-subtitle>
+      <ion-card-title>{{ book.title }}</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      {{ book.reader }} {{ book.id }}
+
+      <ion-icon name="play-outline" (click)="play(book.id)"></ion-icon>
+    </ion-card-content>
+  </ion-card>
 </ion-content>
