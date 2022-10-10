@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
+import { NavController } from '@ionic/angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BooksGQL, BooksQuery } from 'src/generated/graphql';
+import { PlayerService } from '../service/player.service';
 
 @Component({
   selector: 'app-tab2',
@@ -10,13 +12,18 @@ import { BooksGQL, BooksQuery } from 'src/generated/graphql';
 })
 export class Tab2Page {
   books: Observable<BooksQuery['books']>;
-  constructor(private booksGql: BooksGQL) {
+  constructor(
+    booksGql: BooksGQL,
+    private player: PlayerService,
+    private navCtl: NavController
+  ) {
     this.books = booksGql
       .watch()
       .valueChanges.pipe(map((result) => result.data.books));
   }
 
-  play(bookID: number) {
-    console.log(bookID);
+  async play(bookID: number) {
+    this.player.load(bookID).then(() => this.player.play());
+    this.navCtl.navigateForward('/tabs/tab1');
   }
 }

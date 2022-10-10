@@ -7,8 +7,50 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
+      <ion-title size="small">Tab 1</ion-title>
     </ion-toolbar>
   </ion-header>
-  <button (click)="play(1)">Play</button>
+  <button *ngIf="playerStatus.empty === state.status" routerLink="/tabs/tab2">
+    Choose book
+  </button>
+  <ng-container *ngIf="state">
+    <ion-range
+      [pin]="true"
+      [pinFormatter]="pinFormatter"
+      [min]="0"
+      [max]="state.duration"
+      [value]="state.position"
+      (ionChange)="onIonChange($event)"
+      (ionKnobMoveStart)="onIonKnobMoveStart($event)"
+      (ionKnobMoveEnd)="onIonKnobMoveEnd($event)"
+    >
+      <span slot="start"></span>
+      <span slot="end">{{ timeLeft() }}</span>
+      <!-- <ion-content slot="start">asd</ion-content>
+      <ion-icon slot="start" name="snow-outline">asd</ion-icon> -->
+      <!-- <ion-icon slot="end" name="sunny-outline">asd</ion-icon> -->
+    </ion-range>
+  </ng-container>
+  <span [ngSwitch]="state.status">
+    <ng-container *ngSwitchCase="playerStatus.loading"
+      ><button>loading</button>
+    </ng-container>
+    <ng-container *ngSwitchCase="playerStatus.empty"
+      ><button (click)="start(1)">Play</button>
+    </ng-container>
+    <ng-container *ngSwitchCase="playerStatus.none"
+      ><button (click)="start(1)">Play</button>
+    </ng-container>
+    <ng-container *ngSwitchCase="playerStatus.play"
+      ><button (click)="pause()">pause</button>
+    </ng-container>
+    <ng-container *ngSwitchCase="playerStatus.pause"
+      ><button (click)="resume()">resume</button>
+    </ng-container>
+    <ng-container *ngSwitchCase="playerStatus.seek"
+      ><button (click)="resume()">seek</button>
+    </ng-container>
+  </span>
+  <hr />
+  {{ state| json }}
 </ion-content>

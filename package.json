@@ -27,6 +27,7 @@
     "@capacitor/keyboard": "4.0.1",
     "@capacitor/status-bar": "4.0.1",
     "@ionic/angular": "^6.1.9",
+    "@types/howler": "^2.2.7",
     "apollo-angular": "^4.0.1",
     "graphql": "^15.5.0",
     "howler": "^2.2.3",

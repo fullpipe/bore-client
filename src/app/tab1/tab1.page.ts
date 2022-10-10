@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { PlayerService } from '../service/player.service';
+import { RangeCustomEvent } from '@ionic/angular';
+import { PlayerService, PlayerStatus, State } from '../service/player.service';
 
 @Component({
   selector: 'app-tab1',
@@ -7,9 +8,64 @@ import { PlayerService } from '../service/player.service';
   styleUrls: ['tab1.page.scss'],
 })
 export class Tab1Page {
-  constructor(private player: PlayerService) {}
+  state: State;
+  playerStatus = PlayerStatus;
 
-  play(id: number) {
-    this.player.play(id);
+  constructor(private player: PlayerService) {
+    this.player.state$.subscribe((s) => (this.state = s));
+  }
+
+  async start(id: number) {
+    await this.player.load(id);
+    this.player.play();
+  }
+  pause() {
+    this.player.pause();
+  }
+  resume() {
+    this.player.play();
+  }
+
+  onIonChange(ev: Event) {
+    if (this.state.status !== PlayerStatus.seek) {
+      return;
+    }
+
+    this.player.seek((ev as RangeCustomEvent).detail.value as number);
+  }
+
+  onIonKnobMoveStart(ev: Event) {
+    this.player.seekStart();
+  }
+
+  onIonKnobMoveEnd(ev: Event) {
+    this.player.play();
+  }
+
+  timeLeft(): string {
+    const value = this.state.duration - this.state.position;
+
+    const minutes = Math.floor(value / 60);
+    const seconds = Math.ceil(value - minutes * 60);
+
+    return `${minutes.toLocaleString('en-US', {
+      minimumIntegerDigits: 2,
+      useGrouping: false,
+    })}:${seconds.toLocaleString('en-US', {
+      minimumIntegerDigits: 2,
+      useGrouping: false,
+    })}`;
+  }
+  pinFormatter(value: number) {
+    const minutes = Math.floor(value / 60);
+    const seconds = Math.ceil(value - minutes * 60);
+
+    return `${minutes.toLocaleString('en-US', {
+      minimumIntegerDigits: 2,
+      useGrouping: false,
+    })}:${seconds.toLocaleString('en-US', {
+      minimumIntegerDigits: 2,
+      useGrouping: false,
+    })}`;
   }
 }
