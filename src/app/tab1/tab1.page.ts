@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { RangeCustomEvent } from '@ionic/angular';
+import { BookQuery } from 'src/generated/graphql';
 import { PlayerService, PlayerStatus, State } from '../service/player.service';
 
 @Component({
@@ -9,10 +10,12 @@ import { PlayerService, PlayerStatus, State } from '../service/player.service';
 })
 export class Tab1Page {
   state: State;
+  book: BookQuery['book'] | null;
   playerStatus = PlayerStatus;
 
   constructor(private player: PlayerService) {
     this.player.state$.subscribe((s) => (this.state = s));
+    this.player.book$.subscribe((b) => (this.book = b));
   }
 
   async start(id: number) {
@@ -24,6 +27,10 @@ export class Tab1Page {
   }
   resume() {
     this.player.play();
+  }
+
+  seekFor(duration: number) {
+    this.player.seekFor(duration);
   }
 
   onIonChange(ev: Event) {

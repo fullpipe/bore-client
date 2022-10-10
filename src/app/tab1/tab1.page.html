@@ -7,13 +7,18 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="small">Tab 1</ion-title>
+      <ion-title size="large">Tab 1</ion-title>
     </ion-toolbar>
   </ion-header>
-  <button *ngIf="playerStatus.empty === state.status" routerLink="/tabs/tab2">
-    Choose book
-  </button>
-  <ng-container *ngIf="state">
+
+  <ng-container *ngIf="!book">
+    <ion-button expand="full" routerLink="/tabs/tab2">
+      <ion-icon slot="start" name="library-outline"></ion-icon>
+      Choose book
+    </ion-button>
+  </ng-container>
+
+  <ng-container *ngIf="book">
     <ion-range
       [pin]="true"
       [pinFormatter]="pinFormatter"
@@ -30,27 +35,73 @@
       <ion-icon slot="start" name="snow-outline">asd</ion-icon> -->
       <!-- <ion-icon slot="end" name="sunny-outline">asd</ion-icon> -->
     </ion-range>
+
+    <ion-button
+      fill="clear"
+      [disabled]="state.status !== playerStatus.pause && state.status !== playerStatus.play"
+      (click)="seekFor(-15)"
+    >
+      -15s <ion-icon name="play-back-outline"></ion-icon>
+    </ion-button>
+
+    <ng-container [ngSwitch]="state.status">
+      <ion-button fill="clear" *ngSwitchCase="playerStatus.pause">
+        <ion-icon name="play-outline"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" *ngSwitchCase="playerStatus.none">
+        <ion-icon name="play-outline"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" *ngSwitchCase="playerStatus.play">
+        <ion-icon name="pause-outline"></ion-icon>
+      </ion-button>
+      <!-- <ion-button fill="clear">
+        <ion-icon name="stop-outline"></ion-icon>
+      </ion-button> -->
+      <ion-button fill="clear" *ngSwitchCase="playerStatus.seek">
+        <ion-icon name="search-outline"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" *ngSwitchCase="playerStatus.loading">
+        <ion-icon name="cloud-download-outline"></ion-icon>
+      </ion-button>
+    </ng-container>
+
+    <ion-button
+      fill="clear"
+      [disabled]="state.status !== playerStatus.pause && state.status !== playerStatus.play"
+      (click)="seekFor(15)"
+    >
+      <ion-icon name="play-forward-outline"></ion-icon> +15s
+    </ion-button>
+
+    <ion-button fill="clear">
+      <ion-icon name="timer-outline"></ion-icon>
+    </ion-button>
+    <ion-button fill="clear">
+      <ion-icon name="speedometer-outline"></ion-icon>
+    </ion-button>
+
+    <span [ngSwitch]="state.status">
+      <ng-container *ngSwitchCase="playerStatus.loading"
+        ><button>loading</button>
+      </ng-container>
+      <ng-container *ngSwitchCase="playerStatus.empty"
+        ><button (click)="start(1)">Play</button>
+      </ng-container>
+      <ng-container *ngSwitchCase="playerStatus.none"
+        ><button (click)="start(1)">Play</button>
+      </ng-container>
+      <ng-container *ngSwitchCase="playerStatus.play"
+        ><button (click)="pause()">pause</button>
+      </ng-container>
+      <ng-container *ngSwitchCase="playerStatus.pause"
+        ><button (click)="resume()">resume</button>
+      </ng-container>
+      <ng-container *ngSwitchCase="playerStatus.seek"
+        ><button (click)="resume()">seek</button>
+      </ng-container>
+    </span>
   </ng-container>
-  <span [ngSwitch]="state.status">
-    <ng-container *ngSwitchCase="playerStatus.loading"
-      ><button>loading</button>
-    </ng-container>
-    <ng-container *ngSwitchCase="playerStatus.empty"
-      ><button (click)="start(1)">Play</button>
-    </ng-container>
-    <ng-container *ngSwitchCase="playerStatus.none"
-      ><button (click)="start(1)">Play</button>
-    </ng-container>
-    <ng-container *ngSwitchCase="playerStatus.play"
-      ><button (click)="pause()">pause</button>
-    </ng-container>
-    <ng-container *ngSwitchCase="playerStatus.pause"
-      ><button (click)="resume()">resume</button>
-    </ng-container>
-    <ng-container *ngSwitchCase="playerStatus.seek"
-      ><button (click)="resume()">seek</button>
-    </ng-container>
-  </span>
+
   <hr />
-  {{ state| json }}
+  <pre>{{state | json}}</pre>
 </ion-content>

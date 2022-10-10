@@ -21,8 +21,10 @@ import { StorageService } from './storage.service';
 })
 export class PlayerService {
   readonly state$: Observable<State>;
-
-  private book: BookQuery['book'];
+  readonly book$: Observable<BookQuery['book'] | null>;
+  private book: BookQuery['book'] | null;
+  private bookSubj: BehaviorSubject<BookQuery['book'] | null> =
+    new BehaviorSubject(null);
   private parts: Part[] = [];
   private cp = 0;
   private state: State = {
@@ -38,6 +40,7 @@ export class PlayerService {
 
   constructor(private bookGql: BookGQL, private storage: StorageService) {
     this.state$ = this.stateSubj.asObservable();
+    this.book$ = this.bookSubj.asObservable();
 
     this.control
       .pipe(
@@ -80,6 +83,7 @@ export class PlayerService {
       .book;
 
     this.book = book;
+    this.bookSubj.next(book);
 
     const loaded = [];
     let globalDuration = 0;
@@ -164,6 +168,20 @@ export class PlayerService {
 
   seek(position: number) {
     this.parts[this.cp].howl.seek(position);
+    this.syncState();
+  }
+
+  seekFor(duration: number) {
+    let newPosition = this.parts[this.cp].howl.seek() + duration;
+    if (newPosition > this.parts[this.cp].duration) {
+      newPosition = this.parts[this.cp].duration;
+    }
+
+    if (newPosition < 0) {
+      newPosition = 0;
+    }
+
+    this.parts[this.cp].howl.seek(newPosition);
     this.syncState();
   }
 
