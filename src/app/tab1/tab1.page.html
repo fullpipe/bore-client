@@ -19,8 +19,13 @@
   </ng-container>
 
   <ng-container *ngIf="book">
-    <h3>{{ book.title }}</h3>
-    <h4>{{ state.title }}</h4>
+    <ion-item>
+      <ion-label>
+        <h2>{{ book.title }}</h2>
+        <p>{{ state.title }}</p>
+      </ion-label>
+    </ion-item>
+
     <ion-range
       [pin]="true"
       [pinFormatter]="pinFormatter"
@@ -94,9 +99,38 @@
     <ion-button fill="clear" (click)="selectSpeed()">
       <ion-icon name="speedometer-outline"></ion-icon>
     </ion-button>
+
+    <ion-list>
+      <ion-item *ngFor="let part of book.parts; let i = index">
+        <ion-button
+          fill="clear"
+          (click)="startPart(i)"
+          *ngIf="state.currentPart !== i"
+        >
+          <ion-icon name="play-outline"></ion-icon>
+        </ion-button>
+
+        <ion-button
+          fill="clear"
+          (click)="resume()"
+          *ngIf="state.status !== playerStatus.play && state.currentPart === i"
+        >
+          <ion-icon name="play-outline"></ion-icon>
+        </ion-button>
+
+        <ion-button
+          fill="clear"
+          (click)="pause()"
+          *ngIf="state.status === playerStatus.play && state.currentPart === i"
+        >
+          <ion-icon name="pause-outline"></ion-icon>
+        </ion-button>
+        <ion-label> {{ part.title }}</ion-label>
+      </ion-item>
+    </ion-list>
   </ng-container>
 
   <hr />
   <pre>{{state | json}}</pre>
-  <pre>{{book | json}}</pre>
+  <!-- <pre>{{book | json}}</pre> -->
 </ion-content>

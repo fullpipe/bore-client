@@ -29,6 +29,7 @@ export class PlayerService {
   private cp = 0;
   private state: State = {
     title: '',
+    currentPart: this.cp,
     status: PlayerStatus.empty,
     speed: 1,
     globalDuration: 0,
@@ -141,6 +142,7 @@ export class PlayerService {
 
     this.parts[this.cp].howl.rate(this.state.speed);
     this.parts[this.cp].howl.play();
+    this.parts[this.cp].howl.off();
     this.parts[this.cp].howl.once('end', () => {
       this.nextPart();
     });
@@ -166,6 +168,19 @@ export class PlayerService {
     if (this.state.status === PlayerStatus.play) {
       this.play();
     }
+  }
+
+  part(idx: number) {
+    if (this.cp === idx) {
+      return;
+    }
+
+    this.parts[this.cp].howl.off();
+    this.cp = idx;
+
+    this.syncState();
+
+    return this;
   }
 
   seekStart() {
@@ -230,6 +245,7 @@ export class PlayerService {
     this.state.position = this.parts[this.cp].howl.seek();
 
     this.state.title = this.parts[this.cp].title;
+    this.state.currentPart = this.cp;
   }
 }
 
@@ -244,6 +260,7 @@ export enum PlayerStatus {
 
 export interface State {
   title: string;
+  currentPart: number;
   status: PlayerStatus;
   speed: number;
   duration: number;

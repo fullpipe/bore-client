@@ -33,6 +33,9 @@ export class Tab1Page {
   resume() {
     this.player.play();
   }
+  startPart(idx: number) {
+    this.player.part(idx).play();
+  }
 
   seekFor(duration: number) {
     this.player.seekFor(duration);
@@ -73,7 +76,6 @@ export class Tab1Page {
         {
           text: 'Cancel',
           role: 'cancel',
-          data: this.state.speed,
         },
       ],
     });
@@ -82,6 +84,11 @@ export class Tab1Page {
 
     const result = await actionSheet.onDidDismiss();
 
+    if (!result.data) {
+      return;
+    }
+
+    console.log(result);
     this.player.speed(result.data as number);
   }
 
@@ -130,6 +137,10 @@ export class Tab1Page {
 
     if (result.role && result.role === 'cancel') {
       this.sleep.stop();
+    }
+
+    if (!result.data) {
+      return;
     }
 
     this.sleep.start(result.data as number);
