@@ -1,15 +1,15 @@
-<ion-header [translucent]="true">
+<!-- <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title> Tab 2 </ion-title>
+    <ion-title>Books to read</ion-title>
   </ion-toolbar>
-</ion-header>
+</ion-header> -->
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
+  <!-- <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Tab 2</ion-title>
+      <ion-title size="large">Books to read</ion-title>
     </ion-toolbar>
-  </ion-header>
+  </ion-header> -->
 
   <ion-card *ngFor="let book of books | async">
     <ion-card-header>
@@ -18,9 +18,9 @@
     </ion-card-header>
 
     <ion-card-content>
-      {{ book.reader }} {{ book.id }}
-
-      <ion-icon name="play-outline" (click)="play(book.id)"></ion-icon>
+      <ion-button fill="clear" (click)="play(book.id)">
+        <ion-icon name="play-outline"></ion-icon>
+      </ion-button>
     </ion-card-content>
   </ion-card>
 </ion-content>

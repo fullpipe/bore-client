@@ -1,15 +1,15 @@
-<ion-header [translucent]="true">
+<!-- <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title> Tab 1 </ion-title>
+    <ion-title>Book</ion-title>
   </ion-toolbar>
-</ion-header>
+</ion-header> -->
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
+  <!-- <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
+      <ion-title size="large">Book</ion-title>
     </ion-toolbar>
-  </ion-header>
+  </ion-header> -->
 
   <ng-container *ngIf="!book">
     <ion-button expand="full" routerLink="/tabs/tab2">
@@ -36,70 +36,70 @@
       (ionKnobMoveStart)="onIonKnobMoveStart($event)"
       (ionKnobMoveEnd)="onIonKnobMoveEnd($event)"
     >
-      <span slot="start"></span>
+      <span slot="start">{{ timePass() }}</span>
       <span slot="end">{{ timeLeft() }}</span>
-      <!-- <ion-content slot="start">asd</ion-content>
-      <ion-icon slot="start" name="snow-outline">asd</ion-icon> -->
-      <!-- <ion-icon slot="end" name="sunny-outline">asd</ion-icon> -->
     </ion-range>
 
-    <ion-button
-      fill="clear"
-      [disabled]="state.status !== playerStatus.pause && state.status !== playerStatus.play"
-      (click)="seekFor(-15)"
-    >
-      -15s <ion-icon name="play-back-outline"></ion-icon>
-    </ion-button>
-
-    <ng-container [ngSwitch]="state.status">
+    <div class="controls">
       <ion-button
         fill="clear"
-        *ngSwitchCase="playerStatus.pause"
-        (click)="resume()"
+        [disabled]="state.status !== playerStatus.pause && state.status !== playerStatus.play"
+        (click)="seekFor(-15)"
       >
-        <ion-icon name="play-outline"></ion-icon>
+        -15s
       </ion-button>
+
+      <ng-container [ngSwitch]="state.status">
+        <ion-button
+          fill="clear"
+          *ngSwitchCase="playerStatus.pause"
+          (click)="resume()"
+        >
+          <ion-icon slot="icon-only" name="play-outline"></ion-icon>
+        </ion-button>
+
+        <ion-button
+          fill="clear"
+          *ngSwitchCase="playerStatus.none"
+          (click)="resume()"
+        >
+          <ion-icon name="play-outline"></ion-icon>
+        </ion-button>
+
+        <ion-button
+          fill="clear"
+          *ngSwitchCase="playerStatus.play"
+          (click)="pause()"
+        >
+          <ion-icon slot="icon-only" name="pause-outline"></ion-icon>
+        </ion-button>
+
+        <ion-button fill="clear" *ngSwitchCase="playerStatus.seek">
+          <ion-icon slot="icon-only" name="search-outline"></ion-icon>
+        </ion-button>
+
+        <ion-button fill="clear" *ngSwitchCase="playerStatus.loading">
+          <ion-icon slot="icon-only" name="cloud-download-outline"></ion-icon>
+        </ion-button>
+      </ng-container>
+
       <ion-button
         fill="clear"
-        *ngSwitchCase="playerStatus.none"
-        (click)="resume()"
+        [disabled]="state.status !== playerStatus.pause && state.status !== playerStatus.play"
+        (click)="seekFor(15)"
       >
-        <ion-icon name="play-outline"></ion-icon>
+        +15s
       </ion-button>
-      <ion-button
-        fill="clear"
-        *ngSwitchCase="playerStatus.play"
-        (click)="pause()"
-      >
-        <ion-icon name="pause-outline"></ion-icon>
+    </div>
+    <div class="actions">
+      <ion-button fill="clear" (click)="selectSleep()">
+        <ion-icon name="timer-outline"></ion-icon>
       </ion-button>
-      <!-- <ion-button fill="clear">
-        <ion-icon name="stop-outline"></ion-icon>
-      </ion-button> -->
-      <ion-button fill="clear" *ngSwitchCase="playerStatus.seek">
-        <ion-icon name="search-outline"></ion-icon>
+
+      <ion-button fill="clear" (click)="selectSpeed()">
+        <ion-icon name="speedometer-outline"></ion-icon>
       </ion-button>
-      <ion-button fill="clear" *ngSwitchCase="playerStatus.loading">
-        <ion-icon name="cloud-download-outline"></ion-icon>
-      </ion-button>
-    </ng-container>
-
-    <ion-button
-      fill="clear"
-      [disabled]="state.status !== playerStatus.pause && state.status !== playerStatus.play"
-      (click)="seekFor(15)"
-    >
-      <ion-icon name="play-forward-outline"></ion-icon> +15s
-    </ion-button>
-
-    <ion-button fill="clear" (click)="selectSleep()">
-      <ion-icon name="timer-outline"></ion-icon>
-    </ion-button>
-
-    <ion-button fill="clear" (click)="selectSpeed()">
-      <ion-icon name="speedometer-outline"></ion-icon>
-    </ion-button>
-
+    </div>
     <ion-list>
       <ion-item *ngFor="let part of book.parts; let i = index">
         <ion-button
@@ -107,7 +107,7 @@
           (click)="startPart(i)"
           *ngIf="state.currentPart !== i"
         >
-          <ion-icon name="play-outline"></ion-icon>
+          <ion-icon slot="icon-only" name="play-outline"></ion-icon>
         </ion-button>
 
         <ion-button
@@ -115,7 +115,7 @@
           (click)="resume()"
           *ngIf="state.status !== playerStatus.play && state.currentPart === i"
         >
-          <ion-icon name="play-outline"></ion-icon>
+          <ion-icon slot="icon-only" name="play-outline"></ion-icon>
         </ion-button>
 
         <ion-button
@@ -123,7 +123,7 @@
           (click)="pause()"
           *ngIf="state.status === playerStatus.play && state.currentPart === i"
         >
-          <ion-icon name="pause-outline"></ion-icon>
+          <ion-icon slot="icon-only" name="pause-outline"></ion-icon>
         </ion-button>
         <ion-label> {{ part.title }}</ion-label>
       </ion-item>

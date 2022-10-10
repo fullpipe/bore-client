@@ -146,6 +146,20 @@ export class Tab1Page {
     this.sleep.start(result.data as number);
   }
 
+  timePass(): string {
+    const value = this.state.position;
+
+    const minutes = Math.floor(value / 60);
+    const seconds = Math.ceil(value - minutes * 60);
+
+    return `${minutes.toLocaleString('en-US', {
+      minimumIntegerDigits: 2,
+      useGrouping: false,
+    })}:${seconds.toLocaleString('en-US', {
+      minimumIntegerDigits: 2,
+      useGrouping: false,
+    })}`;
+  }
   timeLeft(): string {
     const value = this.state.duration - this.state.position;
 
@@ -160,6 +174,7 @@ export class Tab1Page {
       useGrouping: false,
     })}`;
   }
+
   pinFormatter(value: number) {
     const minutes = Math.floor(value / 60);
     const seconds = Math.ceil(value - minutes * 60);
