@@ -19,6 +19,8 @@
   </ng-container>
 
   <ng-container *ngIf="book">
+    <h3>{{ book.title }}</h3>
+    <h4>{{ state.title }}</h4>
     <ion-range
       [pin]="true"
       [pinFormatter]="pinFormatter"
@@ -45,13 +47,25 @@
     </ion-button>
 
     <ng-container [ngSwitch]="state.status">
-      <ion-button fill="clear" *ngSwitchCase="playerStatus.pause">
+      <ion-button
+        fill="clear"
+        *ngSwitchCase="playerStatus.pause"
+        (click)="resume()"
+      >
         <ion-icon name="play-outline"></ion-icon>
       </ion-button>
-      <ion-button fill="clear" *ngSwitchCase="playerStatus.none">
+      <ion-button
+        fill="clear"
+        *ngSwitchCase="playerStatus.none"
+        (click)="resume()"
+      >
         <ion-icon name="play-outline"></ion-icon>
       </ion-button>
-      <ion-button fill="clear" *ngSwitchCase="playerStatus.play">
+      <ion-button
+        fill="clear"
+        *ngSwitchCase="playerStatus.play"
+        (click)="pause()"
+      >
         <ion-icon name="pause-outline"></ion-icon>
       </ion-button>
       <!-- <ion-button fill="clear">
@@ -73,35 +87,16 @@
       <ion-icon name="play-forward-outline"></ion-icon> +15s
     </ion-button>
 
-    <ion-button fill="clear">
+    <ion-button fill="clear" (click)="selectSleep()">
       <ion-icon name="timer-outline"></ion-icon>
     </ion-button>
-    <ion-button fill="clear">
+
+    <ion-button fill="clear" (click)="selectSpeed()">
       <ion-icon name="speedometer-outline"></ion-icon>
     </ion-button>
-
-    <span [ngSwitch]="state.status">
-      <ng-container *ngSwitchCase="playerStatus.loading"
-        ><button>loading</button>
-      </ng-container>
-      <ng-container *ngSwitchCase="playerStatus.empty"
-        ><button (click)="start(1)">Play</button>
-      </ng-container>
-      <ng-container *ngSwitchCase="playerStatus.none"
-        ><button (click)="start(1)">Play</button>
-      </ng-container>
-      <ng-container *ngSwitchCase="playerStatus.play"
-        ><button (click)="pause()">pause</button>
-      </ng-container>
-      <ng-container *ngSwitchCase="playerStatus.pause"
-        ><button (click)="resume()">resume</button>
-      </ng-container>
-      <ng-container *ngSwitchCase="playerStatus.seek"
-        ><button (click)="resume()">seek</button>
-      </ng-container>
-    </span>
   </ng-container>
 
   <hr />
   <pre>{{state | json}}</pre>
+  <pre>{{book | json}}</pre>
 </ion-content>

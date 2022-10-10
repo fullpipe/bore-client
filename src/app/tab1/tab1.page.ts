@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { RangeCustomEvent } from '@ionic/angular';
+import { ActionSheetController, RangeCustomEvent } from '@ionic/angular';
 import { BookQuery } from 'src/generated/graphql';
 import { PlayerService, PlayerStatus, State } from '../service/player.service';
+import { SleepService } from '../service/sleep.service';
 
 @Component({
   selector: 'app-tab1',
@@ -13,7 +14,11 @@ export class Tab1Page {
   book: BookQuery['book'] | null;
   playerStatus = PlayerStatus;
 
-  constructor(private player: PlayerService) {
+  constructor(
+    private player: PlayerService,
+    private sleep: SleepService,
+    private actionSheetCtrl: ActionSheetController
+  ) {
     this.player.state$.subscribe((s) => (this.state = s));
     this.player.book$.subscribe((b) => (this.book = b));
   }
@@ -47,6 +52,87 @@ export class Tab1Page {
 
   onIonKnobMoveEnd(ev: Event) {
     this.player.play();
+  }
+
+  async selectSpeed() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Change playback speed',
+      buttons: [
+        {
+          text: 'x0.8',
+          data: 0.8,
+        },
+        {
+          text: 'x1.0',
+          data: 1,
+        },
+        {
+          text: 'x1.2',
+          data: 1.2,
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          data: this.state.speed,
+        },
+      ],
+    });
+
+    await actionSheet.present();
+
+    const result = await actionSheet.onDidDismiss();
+
+    this.player.speed(result.data as number);
+  }
+
+  async selectSleep() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Stop after',
+      buttons: [
+        {
+          text: '3 seconds',
+          data: 3,
+        },
+        {
+          text: '10 minutes',
+          data: 10 * 60,
+        },
+        {
+          text: '20 minutes',
+          data: 20 * 60,
+        },
+        {
+          text: '30 minutes',
+          data: 30 * 60,
+        },
+        {
+          text: '40 minutes',
+          data: 40 * 60,
+        },
+        {
+          text: '50 minutes',
+          data: 50 * 60,
+        },
+        {
+          text: '60 minutes',
+          data: 60 * 60,
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+      ],
+    });
+
+    await actionSheet.present();
+
+    const result = await actionSheet.onDidDismiss();
+
+    if (result.role && result.role === 'cancel') {
+      this.sleep.stop();
+    }
+
+    this.sleep.start(result.data as number);
   }
 
   timeLeft(): string {
