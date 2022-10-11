@@ -94,7 +94,7 @@ export class PlayerService {
     book.parts.forEach((p, idx) => {
       const part: Part = {
         howl: new Howl({
-          src: ['http://localhost:8080/static/' + p.path],
+          src: ['http://localhost:8080/books/' + p.path],
           html5: true,
         }),
         title: p.title,
