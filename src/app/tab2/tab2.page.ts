@@ -3,6 +3,7 @@ import { NavController } from '@ionic/angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BooksGQL, BooksQuery } from 'src/generated/graphql';
+import { AuthService } from '../service/auth.service';
 import { PlayerService } from '../service/player.service';
 
 @Component({
@@ -15,7 +16,8 @@ export class Tab2Page {
   constructor(
     booksGql: BooksGQL,
     private player: PlayerService,
-    private navCtl: NavController
+    private navCtl: NavController,
+    protected auth: AuthService
   ) {
     this.books = booksGql
       .watch()

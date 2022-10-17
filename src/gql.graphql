@@ -4,6 +4,12 @@ query books {
     title
     author
     reader
+    state
+    error
+    download {
+      state
+      error
+    }
   }
 }
 
@@ -19,5 +25,32 @@ query book($id: ID!) {
       possition
       path
     }
+  }
+}
+
+mutation createBook($input: NewBookInput!) {
+  createBook(input: $input) {
+    title
+    id
+  }
+}
+
+mutation loginRequest($input: LoginRequestInput!) {
+  loginRequest(input: $input)
+}
+
+mutation login($input: LoginInput!) {
+  login(input: $input) {
+    access
+    refresh
+    roles
+  }
+}
+
+mutation refresh($refreshToken: String!) {
+  refreshToken(refreshToken: $refreshToken) {
+    access
+    refresh
+    roles
   }
 }

@@ -1,0 +1,40 @@
+<form #requestForm="ngForm" *ngIf="!requestID" (ngSubmit)="loginRequest()">
+  <ion-item>
+    <ion-label position="floating">Email</ion-label>
+    <ion-input
+      type="email"
+      name="email"
+      [(ngModel)]="email"
+      placeholder="email@domain.com"
+    ></ion-input>
+  </ion-item>
+
+  <ion-button
+    type="submit"
+    [disabled]="requestForm.invalid || requestForm.untouched"
+    expand="full"
+  >
+    Request OTP
+  </ion-button>
+</form>
+
+<form #otpForm="ngForm" *ngIf="requestID" (ngSubmit)="login()">
+  <ion-item>
+    <ion-label position="floating">OTP from email</ion-label>
+    <ion-input
+      type="text"
+      name="code"
+      pattern="[\d]{6}"
+      [(ngModel)]="code"
+      placeholder="OTP"
+    ></ion-input>
+  </ion-item>
+
+  <ion-button
+    type="submit"
+    [disabled]="otpForm.invalid || otpForm.untouched"
+    expand="full"
+  >
+    Login
+  </ion-button>
+</form>
