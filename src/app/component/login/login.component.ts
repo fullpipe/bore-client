@@ -10,8 +10,10 @@ import { LoginGQL, LoginRequestGQL, Role } from 'src/generated/graphql';
 })
 export class LoginComponent implements OnInit {
   requestID: number;
-  email: string = 'asdasd@asdsad.asd';
-  code: string = '111112';
+  // email: string = 'asdasd@asdsad.asd';
+  // code: string = '111112';
+  email: string;
+  code: string;
   loading = false;
 
   constructor(
