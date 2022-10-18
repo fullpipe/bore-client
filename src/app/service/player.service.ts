@@ -176,9 +176,12 @@ export class PlayerService {
     }
 
     this.parts[this.cp].howl.off();
+    this.parts[this.cp].howl.pause();
     this.cp = idx;
 
-    this.syncState();
+    if (this.state.status === PlayerStatus.play) {
+      this.play();
+    }
 
     return this;
   }

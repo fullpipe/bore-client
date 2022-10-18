@@ -92,7 +92,11 @@
       </ion-button>
     </div>
     <div class="actions">
-      <ion-button fill="clear" (click)="selectSleep()">
+      <ion-button
+        fill="clear"
+        (click)="selectSleep()"
+        [disabled]="state.status !== playerStatus.play"
+      >
         <ion-icon name="timer-outline"></ion-icon>
       </ion-button>
 

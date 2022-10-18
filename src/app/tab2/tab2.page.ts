@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { QueryRef } from 'apollo-angular';
+import { Observable, timer } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { BooksGQL, BooksQuery } from 'src/generated/graphql';
 import { AuthService } from '../service/auth.service';
 import { PlayerService } from '../service/player.service';
@@ -11,27 +12,43 @@ import { PlayerService } from '../service/player.service';
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
 })
-export class Tab2Page implements OnInit {
+export class Tab2Page {
   books: Observable<BooksQuery['books']>;
+
+  private query: QueryRef<BooksQuery>;
+
   constructor(
-    booksGql: BooksGQL,
+    private booksGql: BooksGQL,
     private player: PlayerService,
     private navCtl: NavController,
     protected auth: AuthService
   ) {
-    console.log('constructor');
-    this.books = booksGql
-      .watch()
-      .valueChanges.pipe(map((result) => result.data.books));
+    this.query = booksGql.watch();
+    this.books = this.query.valueChanges.pipe(
+      map((result) => result.data.books)
+    );
   }
 
-  ngOnInit(): void {
-    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
-    console.log('ngOnInit');
+  bookID(_: number, book: BooksQuery['books'][0]): number {
+    return book.id;
   }
+
   async play(bookID: number) {
     this.player.load(bookID).then(() => this.player.play());
     this.navCtl.navigateForward('/tabs/tab1');
+  }
+
+  async restart(bookID: number) {
+    console.log('restart', bookID);
+    this.booksGql.watch().refetch();
+  }
+
+  ionViewWillEnter(): void {
+    this.query.refetch();
+    this.query.startPolling(5000);
+  }
+
+  ionViewDidLeave(): void {
+    this.query.stopPolling();
   }
 }

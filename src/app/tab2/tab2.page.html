@@ -11,18 +11,41 @@
     </ion-toolbar>
   </ion-header> -->
 
-  <ion-card *ngFor="let book of books | async">
+  <ion-card *ngFor="let book of books | async; trackBy:bookID">
+    <img
+      alt="Silhouette of mountains"
+      src="https://ionicframework.com/docs/img/demos/card-media.png"
+    />
     <ion-card-header>
       <ion-card-subtitle>{{ book.author }}</ion-card-subtitle>
       <ion-card-title>{{ book.title }}</ion-card-title>
     </ion-card-header>
 
     <ion-card-content>
-      <ion-button fill="clear" (click)="play(book.id)">
-        <ion-icon name="play-outline"></ion-icon>
-      </ion-button>
+      book state: {{ book.state }} <br />
+      download state: {{ book.download.state }}
     </ion-card-content>
+
+    <ion-button
+      fill="clear"
+      (click)="play(book.id)"
+      *ngIf="book.state === 'ready'"
+    >
+      play
+      <ion-icon name="play-outline"></ion-icon>
+    </ion-button>
+
+    <ion-button
+      fill="clear"
+      color="warning"
+      (click)="restart(book.id)"
+      *ngIf="book.state !== 'ready'"
+    >
+      restart
+      <ion-icon name="refresh-outline"></ion-icon>
+    </ion-button>
   </ion-card>
+
   <ng-container *ngIf="(auth.isAdmin$ | async) === true">
     <ion-fab vertical="bottom" horizontal="end" slot="fixed">
       <ion-fab-button routerLink="/tabs/tab2/book-new">
