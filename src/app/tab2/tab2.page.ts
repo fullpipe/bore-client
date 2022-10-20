@@ -3,7 +3,7 @@ import { NavController } from '@ionic/angular';
 import { QueryRef } from 'apollo-angular';
 import { Observable, timer } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { BooksGQL, BooksQuery } from 'src/generated/graphql';
+import { BooksGQL, BooksQuery, DeleteGQL } from 'src/generated/graphql';
 import { AuthService } from '../service/auth.service';
 import { PlayerService } from '../service/player.service';
 
@@ -19,6 +19,7 @@ export class Tab2Page {
 
   constructor(
     private booksGql: BooksGQL,
+    private deleteGql: DeleteGQL,
     private player: PlayerService,
     private navCtl: NavController,
     protected auth: AuthService
@@ -41,6 +42,11 @@ export class Tab2Page {
   async restart(bookID: number) {
     console.log('restart', bookID);
     this.booksGql.watch().refetch();
+  }
+
+  async delete(bookID: number) {
+    await this.deleteGql.mutate({ bookID }).toPromise();
+    this.query.refetch();
   }
 
   ionViewWillEnter(): void {

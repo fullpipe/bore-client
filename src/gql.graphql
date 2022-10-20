@@ -10,6 +10,14 @@ query books {
       state
       error
     }
+    progress {
+      part
+      speed
+      position
+      globalDuration
+      globalPosition
+      updatedAt
+    }
   }
 }
 
@@ -19,6 +27,15 @@ query book($id: ID!) {
     title
     author
     reader
+
+    progress {
+      part
+      speed
+      position
+      globalDuration
+      globalPosition
+      updatedAt
+    }
 
     parts {
       title
@@ -52,5 +69,15 @@ mutation refresh($refreshToken: String!) {
     access
     refresh
     roles
+  }
+}
+
+mutation delete($bookID: ID!) {
+  delete(bookID: $bookID)
+}
+
+mutation progress($progress: ProgressInput!) {
+  progress(input: $progress) {
+    globalDuration
   }
 }

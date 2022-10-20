@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
@@ -15,10 +16,9 @@ const config: CodegenConfig = {
   },
   config: {
     scalars: {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
       Uint: 'number',
-      // eslint-disable-next-line @typescript-eslint/naming-convention
       ID: 'number',
+      Time: 'Date',
     },
   },
 };

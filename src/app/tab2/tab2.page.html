@@ -24,6 +24,10 @@
     <ion-card-content>
       book state: {{ book.state }} <br />
       download state: {{ book.download.state }}
+
+      <!-- <ng-container *ngIf="book.progress">
+        {{book.progress|json}}
+      </ng-container> -->
     </ion-card-content>
 
     <ion-button
@@ -35,15 +39,22 @@
       <ion-icon name="play-outline"></ion-icon>
     </ion-button>
 
-    <ion-button
-      fill="clear"
-      color="warning"
-      (click)="restart(book.id)"
-      *ngIf="book.state !== 'ready'"
-    >
-      restart
-      <ion-icon name="refresh-outline"></ion-icon>
-    </ion-button>
+    <ng-container *ngIf="(auth.isAdmin$ | async) === true">
+      <ion-button
+        fill="clear"
+        color="warning"
+        (click)="restart(book.id)"
+        *ngIf="book.state !== 'ready'"
+      >
+        restart
+        <ion-icon name="refresh-outline"></ion-icon>
+      </ion-button>
+
+      <ion-button fill="clear" color="danger" (click)="delete(book.id)">
+        delete
+        <ion-icon name="trash-outline"></ion-icon>
+      </ion-button>
+    </ng-container>
   </ion-card>
 
   <ng-container *ngIf="(auth.isAdmin$ | async) === true">

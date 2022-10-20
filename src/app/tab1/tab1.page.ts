@@ -27,12 +27,15 @@ export class Tab1Page {
     await this.player.load(id);
     this.player.play();
   }
+
   pause() {
     this.player.pause();
   }
+
   resume() {
     this.player.play();
   }
+
   startPart(idx: number) {
     this.player.part(idx).play();
   }

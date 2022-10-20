@@ -31,6 +31,8 @@ export class AppComponent implements AfterViewInit {
       },
     });
     loadFromState.enable();
+
+    // this.player
     // this.player.loadFromState();
   }
 }

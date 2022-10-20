@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BookGQL, BookQuery } from 'src/generated/graphql';
+import { BookGQL, BookQuery, ProgressGQL } from 'src/generated/graphql';
 import { Howl } from 'howler';
 import {
   BehaviorSubject,
@@ -12,9 +12,11 @@ import {
   Observable,
   timer,
   merge,
+  of,
 } from 'rxjs';
-import { filter, map, mergeAll, switchMap, tap } from 'rxjs/operators';
+import { filter, map, mergeAll, share, switchMap, tap } from 'rxjs/operators';
 import { StorageService } from './storage.service';
+import { ProgressService } from './progress.service';
 
 @Injectable({
   providedIn: 'root',
@@ -39,44 +41,74 @@ export class PlayerService {
   };
   private stateSubj: BehaviorSubject<State> = new BehaviorSubject(this.state);
   private control: Subject<PlayerStatus> = new Subject();
+  private timer$: Observable<number>;
 
-  constructor(private bookGql: BookGQL, private storage: StorageService) {
+  constructor(
+    private bookGql: BookGQL,
+    private storage: StorageService,
+    private progress: ProgressService
+  ) {
     this.state$ = this.stateSubj.asObservable();
     this.book$ = this.bookSubj.asObservable();
 
-    this.control
+    this.timer$ = this.control.pipe(
+      filter((s) => this.state.status !== s),
+      tap((s) => {
+        this.state.status = s;
+      }),
+      switchMap(() => {
+        switch (this.state.status) {
+          case PlayerStatus.play:
+            return timer(0, 1000);
+          case PlayerStatus.loading: // ignoring loading state
+            return EMPTY;
+          default:
+            return of(0);
+        }
+      }),
+      share()
+    );
+
+    this.timer$
       .pipe(
-        filter((s) => this.state.status !== s),
-        tap((s) => {
-          this.state.status = s;
-        }),
-        switchMap(() => {
-          switch (this.state.status) {
-            case PlayerStatus.play:
-              return timer(0, 1000);
-            default:
-              return EMPTY;
-          }
-        }),
-        tap(() => this.syncState())
+        tap(() => {
+          this.syncState();
+          this.saveState();
+        })
       )
       .subscribe(() => {
         this.stateSubj.next(this.state);
-        this.saveState();
       });
+
+    this.timer$.pipe(filter((t) => t % 5 === 0)).subscribe(() => {
+      this.saveProgress();
+    });
   }
 
   async loadFromState() {
+    console.count();
     const savedState = this.storage.get<SavedState>('player');
     if (!savedState) {
       return;
     }
 
-    await this.load(savedState.bookID);
+    const progress = await this.progress.getBookProgress(savedState.bookID);
+    if (!progress) {
+      console.log('no progress');
+      return;
+    }
 
-    this.cp = savedState.currentPart;
-    this.seek(savedState.position);
-    this.speed(savedState.speed);
+    console.count();
+
+    await this.load(savedState.bookID);
+    console.count();
+    this.cp = progress.part || 0;
+    console.count();
+    this.seek(progress.position || 0);
+    console.count();
+    this.speed(progress.speed || 1);
+
+    console.log('loadFromState', this.state);
     this.control.next(PlayerStatus.none);
   }
 
@@ -118,34 +150,37 @@ export class PlayerService {
 
     return Promise.all(loaded).then(() => {
       this.state.globalDuration = globalDuration;
-      this.syncState();
-      this.control.next(PlayerStatus.none);
+      // this.syncState();
+      // this.control.next(PlayerStatus.none);
     });
   }
 
   play() {
-    if (this.parts[this.cp].howl.state() !== 'loaded') {
-      this.parts[this.cp].howl.load();
-      this.parts[this.cp].howl.once('load', () => {
-        this.play();
-      });
-
+    console.count('play');
+    if (this.parts[this.cp].howl.playing()) {
+      console.log('already playing ');
       return;
     }
 
-    console.log('play');
+    // if (this.parts[this.cp].howl.state() !== 'loaded') {
+    //   this.parts[this.cp].howl.load();
+    //   this.parts[this.cp].howl.once('load', () => {
+    //     this.play();
+    //   });
 
-    // // TODO: remove
-    // if (this.cp === 0) {
-    //   this.parts[this.cp].howl.seek(this.parts[this.cp].howl.duration() - 5);
+    //   return;
     // }
 
+    console.count('play');
+
+    this.parts[this.cp].howl.seek(this.state.position);
     this.parts[this.cp].howl.rate(this.state.speed);
-    this.parts[this.cp].howl.play();
     this.parts[this.cp].howl.off();
     this.parts[this.cp].howl.once('end', () => {
       this.nextPart();
     });
+    this.parts[this.cp].howl.play();
+    console.count('play');
     this.control.next(PlayerStatus.play);
   }
 
@@ -162,9 +197,6 @@ export class PlayerService {
       this.stop();
     }
 
-    // // TODO: remove
-    // this.parts[this.cp].howl.seek(this.parts[this.cp].howl.duration() - 5);
-
     if (this.state.status === PlayerStatus.play) {
       this.play();
     }
@@ -177,6 +209,7 @@ export class PlayerService {
 
     this.parts[this.cp].howl.off();
     this.parts[this.cp].howl.pause();
+    this.seek(0);
     this.cp = idx;
 
     if (this.state.status === PlayerStatus.play) {
@@ -230,13 +263,37 @@ export class PlayerService {
 
     this.storage.set<SavedState>('player', {
       bookID: this.book.id,
-      currentPart: this.cp,
+      part: this.cp,
       position: this.state.position,
       speed: this.state.speed,
     });
   }
 
+  private async saveProgress() {
+    if (!this.book) {
+      return;
+    }
+
+    if (!this.state.globalDuration) {
+      return;
+    }
+
+    await this.progress.save({
+      bookID: this.book.id,
+      part: this.cp,
+      position: this.state.position,
+      speed: this.state.speed,
+      globalDuration: this.state.globalDuration,
+      globalPosition: this.state.globalPosition,
+    });
+  }
+
   private syncState() {
+    if (this.parts.length === 0) {
+      console.warn('unable to syncState, no parts loaded');
+      return;
+    }
+
     let globalPosition = 0;
     for (let i = 0; i < this.cp; i++) {
       globalPosition += this.parts[i].duration;
@@ -280,7 +337,7 @@ interface Part {
 
 interface SavedState {
   bookID: number;
-  currentPart: number;
+  part: number;
   position: number;
   speed: number;
 }
