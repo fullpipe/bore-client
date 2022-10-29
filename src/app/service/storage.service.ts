@@ -12,7 +12,7 @@ export class StorageService {
     const raw = localStorage.getItem(key);
 
     if (raw === null) {
-      return def !== null ? def : null;
+      return def !== undefined ? def : null;
     }
 
     return JSON.parse(raw) as T;
