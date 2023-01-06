@@ -7,9 +7,9 @@ import { AuthService, Pair } from './service/auth.service';
 import { ErrorResponse, onError } from '@apollo/client/link/error';
 import { RefreshGQL } from 'src/generated/graphql';
 import { RetryLink } from '@apollo/client/link/retry';
-import { catchError } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
-const uri = 'http://localhost:8080/query'; // <-- add the URL of the GraphQL server here
+const uri = environment.graphQLUrl;
 
 export const createApollo = (
   httpLink: HttpLink,

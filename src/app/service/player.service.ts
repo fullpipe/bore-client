@@ -1,22 +1,11 @@
 import { Injectable } from '@angular/core';
-import { BookGQL, BookQuery, ProgressGQL } from 'src/generated/graphql';
+import { BookGQL, BookQuery } from 'src/generated/graphql';
 import { Howl } from 'howler';
-import {
-  BehaviorSubject,
-  Subject,
-  bindCallback,
-  fromEvent,
-  interval,
-  NEVER,
-  EMPTY,
-  Observable,
-  timer,
-  merge,
-  of,
-} from 'rxjs';
-import { filter, map, mergeAll, share, switchMap, tap } from 'rxjs/operators';
+import { BehaviorSubject, Subject, EMPTY, Observable, timer, of } from 'rxjs';
+import { filter, share, switchMap, tap } from 'rxjs/operators';
 import { StorageService } from './storage.service';
 import { ProgressService } from './progress.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -86,7 +75,7 @@ export class PlayerService {
   }
 
   async loadFromState() {
-    console.count();
+    console.count('loadFromState');
     const savedState = this.storage.get<SavedState>('player');
     if (!savedState) {
       return;
@@ -98,14 +87,14 @@ export class PlayerService {
       return;
     }
 
-    console.count();
+    console.count('loadFromState');
 
     await this.load(savedState.bookID);
-    console.count();
+    console.count('loadFromState');
     this.cp = progress.part || 0;
-    console.count();
+    console.count('loadFromState');
     this.seek(progress.position || 0);
-    console.count();
+    console.count('loadFromState');
     this.speed(progress.speed || 1);
 
     console.log('loadFromState', this.state);
@@ -113,9 +102,12 @@ export class PlayerService {
   }
 
   async load(bookID: number) {
+    console.log('load: ', bookID);
     this.control.next(PlayerStatus.loading);
     const book = (await this.bookGql.fetch({ id: bookID }).toPromise()).data
       .book;
+
+    console.log(book);
 
     this.book = book;
     this.bookSubj.next(book);
@@ -126,7 +118,7 @@ export class PlayerService {
     book.parts.forEach((p, idx) => {
       const part: Part = {
         howl: new Howl({
-          src: ['http://localhost:8080/books/' + p.path],
+          src: [environment.bookUrl + '/' + p.path],
           html5: true,
         }),
         title: p.title,
@@ -157,19 +149,20 @@ export class PlayerService {
 
   play() {
     console.count('play');
+    console.log(this.parts[this.cp].howl.state());
     if (this.parts[this.cp].howl.playing()) {
       console.log('already playing ');
       return;
     }
 
-    // if (this.parts[this.cp].howl.state() !== 'loaded') {
-    //   this.parts[this.cp].howl.load();
-    //   this.parts[this.cp].howl.once('load', () => {
-    //     this.play();
-    //   });
+    if (this.parts[this.cp].howl.state() !== 'loaded') {
+      this.parts[this.cp].howl.load();
+      this.parts[this.cp].howl.once('load', () => {
+        this.play();
+      });
 
-    //   return;
-    // }
+      return;
+    }
 
     console.count('play');
 
@@ -202,6 +195,12 @@ export class PlayerService {
     }
   }
 
+  pause() {
+    this.parts[this.cp].howl.off();
+    this.parts[this.cp].howl.pause();
+    this.control.next(PlayerStatus.pause);
+  }
+
   part(idx: number) {
     if (this.cp === idx) {
       return;
@@ -209,8 +208,9 @@ export class PlayerService {
 
     this.parts[this.cp].howl.off();
     this.parts[this.cp].howl.pause();
-    this.seek(0);
+
     this.cp = idx;
+    this.seek(0);
 
     if (this.state.status === PlayerStatus.play) {
       this.play();
@@ -248,12 +248,6 @@ export class PlayerService {
     this.parts[this.cp].howl.off();
     this.parts[this.cp].howl.stop();
     this.control.next(PlayerStatus.none);
-  }
-
-  pause() {
-    this.parts[this.cp].howl.off();
-    this.parts[this.cp].howl.pause();
-    this.control.next(PlayerStatus.pause);
   }
 
   private saveState() {
