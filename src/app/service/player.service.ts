@@ -170,6 +170,9 @@ export class PlayerService {
     this.parts[this.cp].howl.rate(this.state.speed);
     this.parts[this.cp].howl.off();
     this.parts[this.cp].howl.once('end', () => {
+      if (!this.hasNextPart()) {
+        return;
+      }
       this.nextPart();
     });
     this.parts[this.cp].howl.play();
@@ -182,12 +185,17 @@ export class PlayerService {
     this.parts[this.cp].howl.rate(this.state.speed);
   }
 
+  hasNextPart() {
+    return this.cp < this.parts.length;
+  }
+
   nextPart() {
     this.parts[this.cp].howl.off();
     this.cp++;
     if (this.cp >= this.parts.length) {
       this.cp = this.parts.length - 1;
       this.stop();
+      return;
     }
 
     if (this.state.status === PlayerStatus.play) {
