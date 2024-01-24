@@ -57,6 +57,7 @@ export class LoginComponent implements OnInit {
         .toPromise();
 
       this.auth.authenticate(pair.data.login);
+      this.nav.navigateForward('/tabs/tab1');
     } catch (error) {
       this.code = '';
     }

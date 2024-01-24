@@ -4,14 +4,16 @@
     <ion-input
       type="email"
       name="email"
+      required
       [(ngModel)]="email"
       placeholder="email@domain.com"
+      clearInput
     ></ion-input>
   </ion-item>
 
   <ion-button
     type="submit"
-    [disabled]="requestForm.invalid || requestForm.untouched"
+    [disabled]="requestForm.invalid || requestForm.pristine"
     expand="full"
   >
     Request OTP
@@ -22,17 +24,20 @@
   <ion-item>
     <ion-label position="floating">OTP from email</ion-label>
     <ion-input
-      type="text"
+      type="number"
       name="code"
       pattern="[\d]{6}"
+      maxlength="6"
+      required
       [(ngModel)]="code"
       placeholder="OTP"
+      clearInput
     ></ion-input>
   </ion-item>
 
   <ion-button
     type="submit"
-    [disabled]="otpForm.invalid || otpForm.untouched"
+    [disabled]="otpForm.invalid || otpForm.pristine"
     expand="full"
   >
     Login

@@ -1,0 +1,12 @@
+{
+    auto_https off
+    http_port 8080
+    admin off
+}
+
+:8080 {
+    root * /app
+    encode zstd gzip
+    file_server
+    try_files {path} /index.html?{query}
+}

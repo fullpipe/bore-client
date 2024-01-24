@@ -77,6 +77,14 @@ export class Tab1Page {
           data: 1.2,
         },
         {
+          text: 'x1.5',
+          data: 1.5,
+        },
+        {
+          text: 'x2',
+          data: 2,
+        },
+        {
           text: 'Cancel',
           role: 'cancel',
         },
@@ -100,28 +108,20 @@ export class Tab1Page {
       header: 'Stop after',
       buttons: [
         {
-          text: '3 seconds',
-          data: 3,
+          text: '30 seconds',
+          data: 30,
         },
         {
-          text: '10 minutes',
-          data: 10 * 60,
+          text: '5 minutes',
+          data: 5 * 60,
         },
         {
-          text: '20 minutes',
-          data: 20 * 60,
+          text: '15 minutes',
+          data: 15 * 60,
         },
         {
           text: '30 minutes',
           data: 30 * 60,
-        },
-        {
-          text: '40 minutes',
-          data: 40 * 60,
-        },
-        {
-          text: '50 minutes',
-          data: 50 * 60,
         },
         {
           text: '60 minutes',
@@ -150,37 +150,16 @@ export class Tab1Page {
   }
 
   timePass(): string {
-    const value = this.state.position;
-
-    const minutes = Math.floor(value / 60);
-    const seconds = Math.ceil(value - minutes * 60);
-
-    return `${minutes.toLocaleString('en-US', {
-      minimumIntegerDigits: 2,
-      useGrouping: false,
-    })}:${seconds.toLocaleString('en-US', {
-      minimumIntegerDigits: 2,
-      useGrouping: false,
-    })}`;
+    return this.formatTime(this.state.position);
   }
+
   timeLeft(): string {
-    const value = this.state.duration - this.state.position;
-
-    const minutes = Math.floor(value / 60);
-    const seconds = Math.ceil(value - minutes * 60);
-
-    return `${minutes.toLocaleString('en-US', {
-      minimumIntegerDigits: 2,
-      useGrouping: false,
-    })}:${seconds.toLocaleString('en-US', {
-      minimumIntegerDigits: 2,
-      useGrouping: false,
-    })}`;
+    return this.formatTime(this.state.duration - this.state.position);
   }
 
-  pinFormatter(value: number) {
-    const minutes = Math.floor(value / 60);
-    const seconds = Math.ceil(value - minutes * 60);
+  formatTime(time: number): string {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.ceil(time - minutes * 60);
 
     return `${minutes.toLocaleString('en-US', {
       minimumIntegerDigits: 2,

@@ -92,6 +92,10 @@ export class PlayerService {
     await this.load(savedState.bookID);
     console.count('loadFromState');
     this.cp = progress.part || 0;
+    if (!this.hasNextPart()) {
+      this.cp = 0;
+    }
+
     console.count('loadFromState');
     this.seek(progress.position || 0);
     console.count('loadFromState');
@@ -102,6 +106,11 @@ export class PlayerService {
   }
 
   async load(bookID: number) {
+    if (this.book && this.book.id === bookID) {
+      console.log(`book ${bookID} already loaded`);
+      return;
+    }
+
     console.log('load: ', bookID);
     this.control.next(PlayerStatus.loading);
     const book = (await this.bookGql.fetch({ id: bookID }).toPromise()).data
@@ -138,6 +147,7 @@ export class PlayerService {
       );
 
       this.parts.push(part);
+      console.log('this.parts.length', this.parts.length);
     });
 
     return Promise.all(loaded).then(() => {
@@ -170,7 +180,10 @@ export class PlayerService {
     this.parts[this.cp].howl.rate(this.state.speed);
     this.parts[this.cp].howl.off();
     this.parts[this.cp].howl.once('end', () => {
+      console.log('end of the part ', this.cp);
+      console.log('this.hasNextPart() ', this.hasNextPart());
       if (!this.hasNextPart()) {
+        this.end();
         return;
       }
       this.nextPart();
@@ -186,21 +199,23 @@ export class PlayerService {
   }
 
   hasNextPart() {
-    return this.cp < this.parts.length;
+    console.log('this.cp,  this.parts.length', this.cp, this.parts.length);
+    return this.cp + 1 < this.parts.length;
   }
 
   nextPart() {
-    this.parts[this.cp].howl.off();
-    this.cp++;
-    if (this.cp >= this.parts.length) {
-      this.cp = this.parts.length - 1;
+    // this.parts[this.cp].howl.off();
+    const nextPartIdx = this.cp + 1;
+    if (nextPartIdx >= this.parts.length) {
       this.stop();
       return;
     }
 
-    if (this.state.status === PlayerStatus.play) {
-      this.play();
-    }
+    this.part(nextPartIdx);
+
+    // if (this.state.status === PlayerStatus.play) {
+    //   this.play();
+    // }
   }
 
   pause() {
@@ -256,6 +271,11 @@ export class PlayerService {
     this.parts[this.cp].howl.off();
     this.parts[this.cp].howl.stop();
     this.control.next(PlayerStatus.none);
+  }
+
+  end() {
+    this.stop();
+    this.cp = 0;
   }
 
   private saveState() {

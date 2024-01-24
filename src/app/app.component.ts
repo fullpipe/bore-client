@@ -26,13 +26,14 @@ export class AppComponent implements AfterViewInit {
       threshold: 0,
       gestureName: 'preload-hook',
       onStart: () => {
+        console.log('onStart');
         this.player.loadFromState();
         loadFromState.destroy();
       },
     });
-    loadFromState.enable();
+    // loadFromState.enable();
 
     // this.player
-    // this.player.loadFromState();
+    this.player.loadFromState();
   }
 }
