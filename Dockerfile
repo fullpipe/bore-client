@@ -22,4 +22,4 @@ FROM caddy:alpine as release
 EXPOSE 8080
 COPY  Caddyfile /etc/caddy/Caddyfile
 
-COPY --from=build /app/build /app
+COPY --from=build /app/www /app
