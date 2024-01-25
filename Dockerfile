@@ -15,7 +15,7 @@ RUN npm ci
 COPY . .
 
 # Generate the build of the application
-RUN npm run build
+RUN npm run build -- --configuration=production
 
 FROM caddy:alpine as release
 

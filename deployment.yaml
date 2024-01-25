@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bore-client
+  labels:
+    app: bore-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bore-client
+  template:
+    metadata:
+      labels:
+        app: bore-client
+    spec:
+      containers:
+        - name: bore-client
+          image: registry.gitlab.com/fullpipe/registry/bore-client:latest
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: "50m"
+              memory: "64Mi"
+      imagePullSecrets:
+        - name: gitlab-registry-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bore-client-service
+spec:
+  ports:
+    - name: http
+      targetPort: 8080
+      port: 8080
+  selector:
+    app: bore-client
+# Ingress in bore-server
