@@ -146,6 +146,8 @@ export class PlayerService {
     this.book = book;
     this.bookSubj.next(book);
 
+    this.title.setTitle(book.title);
+
     book.parts.forEach((p, _idx): void => {
       const part: Part = {
         howl: new Howl({
@@ -233,6 +235,7 @@ export class PlayerService {
   pause() {
     this.cp.howl.off();
     this.cp.howl.pause();
+    this.position = this.cp.howl.seek();
     this.control.next(PlayerStatus.pause);
     this.pubState();
   }
