@@ -14,8 +14,6 @@ query books {
       part
       speed
       position
-      globalDuration
-      globalPosition
       updatedAt
     }
   }
@@ -32,8 +30,6 @@ query book($id: ID!) {
       part
       speed
       position
-      globalDuration
-      globalPosition
       updatedAt
     }
 
@@ -41,6 +37,7 @@ query book($id: ID!) {
       title
       possition
       path
+      duration
     }
   }
 }
@@ -78,6 +75,6 @@ mutation delete($bookID: ID!) {
 
 mutation progress($progress: ProgressInput!) {
   progress(input: $progress) {
-    globalDuration
+    position
   }
 }

@@ -13,11 +13,12 @@ export class Tab1Page {
   state: State;
   book: BookQuery['book'] | null;
   playerStatus = PlayerStatus;
+  beforeSeek: PlayerStatus;
 
   constructor(
     private player: PlayerService,
     private sleep: SleepService,
-    private actionSheetCtrl: ActionSheetController
+    private actionSheetCtrl: ActionSheetController,
   ) {
     this.player.state$.subscribe((s) => (this.state = s));
     this.player.book$.subscribe((b) => (this.book = b));
@@ -53,11 +54,16 @@ export class Tab1Page {
   }
 
   onIonKnobMoveStart(ev: Event) {
+    this.beforeSeek = this.state.status;
     this.player.seekStart();
   }
 
   onIonKnobMoveEnd(ev: Event) {
-    this.player.play();
+    if (this.beforeSeek == PlayerStatus.play) {
+      this.player.play();
+    } else {
+      this.player.pause();
+    }
   }
 
   async selectSpeed() {

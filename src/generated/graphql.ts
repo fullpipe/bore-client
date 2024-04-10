@@ -116,6 +116,7 @@ export type NewBookInput = {
 
 export type Part = {
   __typename?: 'Part';
+  duration: Scalars['Float'];
   id: Scalars['ID'];
   path: Scalars['String'];
   possition: Scalars['Uint'];
@@ -125,8 +126,6 @@ export type Part = {
 
 export type Progress = {
   __typename?: 'Progress';
-  globalDuration: Scalars['Float'];
-  globalPosition: Scalars['Float'];
   part: Scalars['Uint'];
   position: Scalars['Float'];
   speed: Scalars['Float'];
@@ -135,8 +134,6 @@ export type Progress = {
 
 export type ProgressInput = {
   bookID: Scalars['ID'];
-  globalDuration: Scalars['Float'];
-  globalPosition: Scalars['Float'];
   part: Scalars['Uint'];
   position: Scalars['Float'];
   speed: Scalars['Float'];
@@ -167,14 +164,14 @@ export enum Role {
 export type BooksQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type BooksQuery = { __typename?: 'Query', books: Array<{ __typename?: 'Book', id: number, title: string, author: string, reader: string, state: any, error?: string | null, download: { __typename?: 'Download', state: any, error?: string | null }, progress?: { __typename?: 'Progress', part: number, speed: number, position: number, globalDuration: number, globalPosition: number, updatedAt: Date } | null }> };
+export type BooksQuery = { __typename?: 'Query', books: Array<{ __typename?: 'Book', id: number, title: string, author: string, reader: string, state: any, error?: string | null, download: { __typename?: 'Download', state: any, error?: string | null }, progress?: { __typename?: 'Progress', part: number, speed: number, position: number, updatedAt: Date } | null }> };
 
 export type BookQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type BookQuery = { __typename?: 'Query', book?: { __typename?: 'Book', id: number, title: string, author: string, reader: string, progress?: { __typename?: 'Progress', part: number, speed: number, position: number, globalDuration: number, globalPosition: number, updatedAt: Date } | null, parts: Array<{ __typename?: 'Part', title: string, possition: number, path: string }> } | null };
+export type BookQuery = { __typename?: 'Query', book?: { __typename?: 'Book', id: number, title: string, author: string, reader: string, progress?: { __typename?: 'Progress', part: number, speed: number, position: number, updatedAt: Date } | null, parts: Array<{ __typename?: 'Part', title: string, possition: number, path: string, duration: number }> } | null };
 
 export type CreateBookMutationVariables = Exact<{
   input: NewBookInput;
@@ -216,7 +213,7 @@ export type ProgressMutationVariables = Exact<{
 }>;
 
 
-export type ProgressMutation = { __typename?: 'Mutation', progress: { __typename?: 'Progress', globalDuration: number } };
+export type ProgressMutation = { __typename?: 'Mutation', progress: { __typename?: 'Progress', position: number } };
 
 export const BooksDocument = gql`
     query books {
@@ -235,8 +232,6 @@ export const BooksDocument = gql`
       part
       speed
       position
-      globalDuration
-      globalPosition
       updatedAt
     }
   }
@@ -247,7 +242,7 @@ export const BooksDocument = gql`
     providedIn: 'root'
   })
   export class BooksGQL extends Apollo.Query<BooksQuery, BooksQueryVariables> {
-    document = BooksDocument;
+    override document = BooksDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
@@ -264,14 +259,13 @@ export const BookDocument = gql`
       part
       speed
       position
-      globalDuration
-      globalPosition
       updatedAt
     }
     parts {
       title
       possition
       path
+      duration
     }
   }
 }
@@ -281,7 +275,7 @@ export const BookDocument = gql`
     providedIn: 'root'
   })
   export class BookGQL extends Apollo.Query<BookQuery, BookQueryVariables> {
-    document = BookDocument;
+    override document = BookDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
@@ -300,7 +294,7 @@ export const CreateBookDocument = gql`
     providedIn: 'root'
   })
   export class CreateBookGQL extends Apollo.Mutation<CreateBookMutation, CreateBookMutationVariables> {
-    document = CreateBookDocument;
+    override document = CreateBookDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
@@ -316,7 +310,7 @@ export const LoginRequestDocument = gql`
     providedIn: 'root'
   })
   export class LoginRequestGQL extends Apollo.Mutation<LoginRequestMutation, LoginRequestMutationVariables> {
-    document = LoginRequestDocument;
+    override document = LoginRequestDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
@@ -336,7 +330,7 @@ export const LoginDocument = gql`
     providedIn: 'root'
   })
   export class LoginGQL extends Apollo.Mutation<LoginMutation, LoginMutationVariables> {
-    document = LoginDocument;
+    override document = LoginDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
@@ -356,7 +350,7 @@ export const RefreshDocument = gql`
     providedIn: 'root'
   })
   export class RefreshGQL extends Apollo.Mutation<RefreshMutation, RefreshMutationVariables> {
-    document = RefreshDocument;
+    override document = RefreshDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
@@ -372,7 +366,7 @@ export const DeleteDocument = gql`
     providedIn: 'root'
   })
   export class DeleteGQL extends Apollo.Mutation<DeleteMutation, DeleteMutationVariables> {
-    document = DeleteDocument;
+    override document = DeleteDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
@@ -381,7 +375,7 @@ export const DeleteDocument = gql`
 export const ProgressDocument = gql`
     mutation progress($progress: ProgressInput!) {
   progress(input: $progress) {
-    globalDuration
+    position
   }
 }
     `;
@@ -390,7 +384,7 @@ export const ProgressDocument = gql`
     providedIn: 'root'
   })
   export class ProgressGQL extends Apollo.Mutation<ProgressMutation, ProgressMutationVariables> {
-    document = ProgressDocument;
+    override document = ProgressDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);

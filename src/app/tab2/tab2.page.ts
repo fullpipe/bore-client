@@ -22,11 +22,11 @@ export class Tab2Page {
     private deleteGql: DeleteGQL,
     private player: PlayerService,
     private navCtl: NavController,
-    protected auth: AuthService
+    protected auth: AuthService,
   ) {
     this.query = booksGql.watch();
     this.books = this.query.valueChanges.pipe(
-      map((result) => result.data.books)
+      map((result) => result.data.books),
     );
   }
 
@@ -51,7 +51,7 @@ export class Tab2Page {
 
   ionViewWillEnter(): void {
     this.query.refetch();
-    this.query.startPolling(5000);
+    // this.query.startPolling(5000);
   }
 
   ionViewDidLeave(): void {

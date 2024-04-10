@@ -13,16 +13,17 @@ export class ProgressService {
     private storage: StorageService,
     private progressGql: ProgressGQL,
     private auth: AuthService,
-    private bookGql: BookGQL
+    private bookGql: BookGQL,
   ) {
     this.auth.logedIn$.subscribe((l) => (this.logedIn = l));
     this.collection = this.storage.get<ProgressCollection>(
       'ProgressCollection',
-      {}
+      {},
     );
   }
 
   async save(progress: Omit<Progress, 'updatedAt'>) {
+    console.log(progress);
     const newProgress: Progress = { ...progress, updatedAt: new Date() };
 
     this.collection[newProgress.bookID] = newProgress;
@@ -38,7 +39,7 @@ export class ProgressService {
   }
 
   async getBookProgress(
-    bookID: number
+    bookID: number,
   ): Promise<Omit<Progress, 'bookID' | 'updatedAt'>> {
     const progress = this.collection[bookID] || null;
 
@@ -68,7 +69,5 @@ export interface Progress {
   part: number;
   position: number;
   speed: number;
-  globalDuration: number;
-  globalPosition: number;
   updatedAt: Date;
 }
