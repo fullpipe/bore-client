@@ -235,7 +235,9 @@ export class PlayerService {
   pause() {
     this.cp.howl.off();
     this.cp.howl.pause();
-    this.position = this.cp.howl.seek();
+    if (this.status == PlayerStatus.play) {
+      this.position = this.cp.howl.seek();
+    }
     this.control.next(PlayerStatus.pause);
     this.pubState();
   }

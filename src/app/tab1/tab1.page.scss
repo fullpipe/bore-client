@@ -1,7 +1,21 @@
 .actions {
-    text-align: right;
+  text-align: right;
 }
 
 .controls {
-    text-align: center;
+  text-align: center;
+}
+
+.mono {
+  font-family: monospace;
+}
+
+ion-range {
+  --pin-background: #fff;
+  --pin-color: #000;
+}
+
+ion-range::part(pin) {
+  font-family: monospace;
+  top: -10px;
 }

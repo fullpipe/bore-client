@@ -36,8 +36,8 @@
       (ionKnobMoveStart)="onIonKnobMoveStart($event)"
       (ionKnobMoveEnd)="onIonKnobMoveEnd($event)"
     >
-      <span slot="start">{{ timePass() }}</span>
-      <span slot="end">{{ timeLeft() }}</span>
+      <span slot="start" class="mono">{{ timePass() }}</span>
+      <span slot="end" class="mono">{{ timeLeft() }}</span>
     </ion-range>
 
     <div class="controls">
