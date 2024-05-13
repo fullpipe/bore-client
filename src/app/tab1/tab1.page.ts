@@ -105,7 +105,6 @@ export class Tab1Page {
       return;
     }
 
-    console.log(result);
     this.player.speed(result.data as number);
   }
 
@@ -141,7 +140,6 @@ export class Tab1Page {
     });
 
     await actionSheet.present();
-
     const result = await actionSheet.onDidDismiss();
 
     if (result.role && result.role === 'cancel') {

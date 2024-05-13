@@ -21,18 +21,9 @@ export class PlayerService {
   status = PlayerStatus.empty;
 
   private book: BookQuery['book'] | null;
-  private bookSubj: BehaviorSubject<BookQuery['book'] | null> =
-    new BehaviorSubject(null);
+  private bookSubj: Subject<BookQuery['book']> = new Subject();
   private parts: Part[] = [];
-  private state: State = {
-    title: '',
-    currentPart: this.currentPartIdx,
-    status: PlayerStatus.empty,
-    speed: 1,
-    duration: 0,
-    position: 0,
-  };
-  private stateSubj: BehaviorSubject<State> = new BehaviorSubject(this.state);
+  private stateSubj: Subject<State> = new Subject();
   private control: Subject<PlayerStatus> = new Subject();
   private timer$: Observable<number>;
 
@@ -61,27 +52,21 @@ export class PlayerService {
       shareReplay(1),
     );
 
-    this.timer$
-      .pipe(
-        tap(() => {
-          // this.syncState();
-        }),
-      )
-      .subscribe(() => {
-        if (this.cp.howl.playing()) {
-          this.position = this.cp.howl.seek();
-          if (this.position > this.cp.duration) {
-            this.position = this.cp.duration;
-          }
-
-          if (this.cp.duration - this.position < 10) {
-            this.preloadNext();
-          }
+    this.timer$.subscribe(() => {
+      if (this.cp.howl.playing()) {
+        this.position = this.cp.howl.seek();
+        if (this.position > this.cp.duration) {
+          this.position = this.cp.duration;
         }
 
-        this.pubState();
-        this.saveState();
-      });
+        if (this.cp.duration - this.position < 10) {
+          this.preloadNext();
+        }
+      }
+
+      this.pubState();
+      this.saveState();
+    });
 
     this.timer$.pipe(filter((t) => t % 5 === 0)).subscribe(() => {
       this.saveProgress();
@@ -104,24 +89,19 @@ export class PlayerService {
   }
 
   async loadFromState() {
-    console.log('loadFromState');
     const savedState = this.storage.get<SavedState>('player');
     if (!savedState) {
-      console.log('no saved state');
       return;
     }
+
+    await this.load(savedState.bookID);
 
     const progress = await this.progress.getBookProgress(savedState.bookID);
     if (!progress) {
-      console.log('no progress');
       return;
     }
 
-    console.log('saved progress:', progress);
-
-    await this.load(savedState.bookID);
     this.currentPartIdx = progress.part || 0;
-
     this.currentPartIdx = progress.part || 0;
     this.position = progress.position || 0;
     this.rate = progress.speed || 1;
@@ -132,16 +112,21 @@ export class PlayerService {
 
   async load(bookID: number) {
     if (this.book && this.book.id === bookID) {
-      console.log(`book ${bookID} already loaded`);
       return;
     }
 
-    console.log('load: ', bookID);
+    if (this.parts.length > 0) {
+      this.end();
+    }
+
+    this.currentPartIdx = 0;
+    this.currentPartIdx = 0;
+    this.position = 0;
+    this.rate = 1;
+
     this.control.next(PlayerStatus.loading);
     const book = (await this.bookGql.fetch({ id: bookID }).toPromise()).data
       .book;
-
-    console.log(book);
 
     this.book = book;
     this.bookSubj.next(book);
@@ -199,7 +184,7 @@ export class PlayerService {
     this.pubState();
   }
 
-  preloadNext() {
+  private preloadNext() {
     if (!this.hasNextPart()) {
       return;
     }
@@ -218,7 +203,7 @@ export class PlayerService {
     this.pubState();
   }
 
-  hasNextPart() {
+  private hasNextPart() {
     return this.currentPartIdx + 1 < this.parts.length;
   }
 
