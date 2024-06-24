@@ -1,12 +1,6 @@
 import { Injector, NgModule } from '@angular/core';
 import { ApolloModule, APOLLO_OPTIONS } from 'apollo-angular';
-import {
-  ApolloError,
-  ApolloLink,
-  InMemoryCache,
-  ServerError,
-  ServerParseError,
-} from '@apollo/client/core';
+import { ApolloLink, InMemoryCache } from '@apollo/client/core';
 import { HttpLink } from 'apollo-angular/http';
 import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { AuthService, Pair } from './service/auth.service';
@@ -16,14 +10,6 @@ import { RetryLink } from '@apollo/client/link/retry';
 import { environment } from 'src/environments/environment';
 
 const uri = environment.graphQLUrl;
-
-function hasNetworkError(
-  error: unknown,
-): error is { networkError: Error | ServerError | ServerParseError } {
-  return Boolean(
-    error && typeof error === 'object' && (error as ApolloError).networkError,
-  );
-}
 
 export const createApollo = (
   httpLink: HttpLink,

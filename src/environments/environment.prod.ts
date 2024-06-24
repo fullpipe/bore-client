@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
   graphQLUrl: 'https://bore.fullpipe.dev/query',
-  bookUrl: 'http://bore.fullpipe.dev/books',
+  bookUrl: 'https://bore.fullpipe.dev/books',
 };

@@ -16,13 +16,13 @@
     [disabled]="requestForm.invalid || requestForm.pristine"
     expand="full"
   >
-    Request OTP
+    Request one time password
   </ion-button>
 </form>
 
 <form #otpForm="ngForm" *ngIf="requestID" (ngSubmit)="login()">
   <ion-item>
-    <ion-label position="floating">OTP from email</ion-label>
+    <ion-label position="floating">One time password from email</ion-label>
     <ion-input
       type="number"
       name="code"
@@ -30,7 +30,7 @@
       maxlength="6"
       required
       [(ngModel)]="code"
-      placeholder="OTP"
+      placeholder="Enter One time password from email"
       clearInput
     ></ion-input>
   </ion-item>

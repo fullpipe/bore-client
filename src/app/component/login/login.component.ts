@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
     private loginRequestGql: LoginRequestGQL,
     private loginGql: LoginGQL,
     private auth: AuthService,
-    private nav: NavController
+    private nav: NavController,
   ) {}
 
   ngOnInit() {}
@@ -57,7 +57,7 @@ export class LoginComponent implements OnInit {
         .toPromise();
 
       this.auth.authenticate(pair.data.login);
-      this.nav.navigateForward('/tabs/tab1');
+      this.nav.navigateForward('books');
     } catch (error) {
       this.code = '';
     }

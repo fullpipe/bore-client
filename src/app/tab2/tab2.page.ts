@@ -36,7 +36,7 @@ export class Tab2Page {
 
   async play(bookID: number) {
     this.player.load(bookID).then(() => this.player.play());
-    this.navCtl.navigateForward('/tabs/tab1');
+    this.navCtl.navigateForward('/play');
   }
 
   async restart(bookID: number) {
@@ -51,7 +51,7 @@ export class Tab2Page {
 
   ionViewWillEnter(): void {
     this.query.refetch();
-    // this.query.startPolling(5000);
+    this.query.startPolling(10000);
   }
 
   ionViewDidLeave(): void {

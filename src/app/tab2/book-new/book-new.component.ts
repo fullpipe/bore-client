@@ -13,7 +13,7 @@ export class BookNewComponent implements OnInit {
 
   constructor(
     private createBookGql: CreateBookGQL,
-    private nav: NavController
+    private nav: NavController,
   ) {}
 
   ngOnInit() {}
@@ -29,7 +29,7 @@ export class BookNewComponent implements OnInit {
       })
       .toPromise();
 
-    this.nav.navigateRoot('/tabs/tab2');
+    this.nav.navigateRoot('/library');
 
     this.loading = false;
   }

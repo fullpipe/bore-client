@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BookGQL, BookQuery } from 'src/generated/graphql';
 import { Howl } from 'howler';
-import { BehaviorSubject, Subject, EMPTY, Observable, timer } from 'rxjs';
+import {
+  BehaviorSubject,
+  Subject,
+  EMPTY,
+  Observable,
+  timer,
+  ReplaySubject,
+} from 'rxjs';
 import { filter, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { StorageService } from './storage.service';
 import { ProgressService } from './progress.service';
@@ -21,10 +28,10 @@ export class PlayerService {
   status = PlayerStatus.empty;
 
   private book: BookQuery['book'] | null;
-  private bookSubj: Subject<BookQuery['book']> = new Subject();
+  private bookSubj: ReplaySubject<BookQuery['book']> = new ReplaySubject(1);
   private parts: Part[] = [];
-  private stateSubj: Subject<State> = new Subject();
-  private control: Subject<PlayerStatus> = new Subject();
+  private stateSubj: ReplaySubject<State> = new ReplaySubject(1);
+  private control: ReplaySubject<PlayerStatus> = new ReplaySubject(1);
   private timer$: Observable<number>;
 
   constructor(
@@ -96,16 +103,6 @@ export class PlayerService {
 
     await this.load(savedState.bookID);
 
-    const progress = await this.progress.getBookProgress(savedState.bookID);
-    if (!progress) {
-      return;
-    }
-
-    this.currentPartIdx = progress.part || 0;
-    this.currentPartIdx = progress.part || 0;
-    this.position = progress.position || 0;
-    this.rate = progress.speed || 1;
-
     this.control.next(PlayerStatus.none);
     this.pubState();
   }
@@ -119,22 +116,23 @@ export class PlayerService {
       this.end();
     }
 
-    this.currentPartIdx = 0;
-    this.currentPartIdx = 0;
-    this.position = 0;
-    this.rate = 1;
-
     this.control.next(PlayerStatus.loading);
     const book = (await this.bookGql.fetch({ id: bookID }).toPromise()).data
       .book;
 
+    if (!book) {
+      return;
+    }
+
     this.book = book;
-    this.bookSubj.next(book);
+    this.parts = [];
 
     this.title.setTitle(book.title);
+    console.log(this.book);
+    this.bookSubj.next(book);
 
-    book.parts.forEach((p, _idx): void => {
-      const part: Part = {
+    this.parts = book.parts.map((p) => {
+      return {
         howl: new Howl({
           src: [environment.bookUrl + '/' + p.path],
           html5: true,
@@ -144,9 +142,16 @@ export class PlayerService {
         title: p.title,
         duration: p.duration,
       };
-
-      this.parts.push(part);
     });
+
+    const progress = await this.progress.getBookProgress(this.book.id);
+    if (!progress) {
+      return;
+    }
+
+    this.currentPartIdx = progress.part || 0;
+    this.position = progress.position || 0;
+    this.rate = progress.speed || 1;
   }
 
   play() {

@@ -21,7 +21,10 @@ export class Tab1Page {
     private actionSheetCtrl: ActionSheetController,
   ) {
     this.player.state$.subscribe((s) => (this.state = s));
-    this.player.book$.subscribe((b) => (this.book = b));
+    this.player.book$.subscribe((b) => {
+      console.log(b);
+      this.book = b;
+    });
   }
 
   async start(id: number) {
