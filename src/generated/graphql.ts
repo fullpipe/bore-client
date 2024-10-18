@@ -13,8 +13,6 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  BookState: any;
-  DownloadState: any;
   Int64: any;
   Time: Date;
   Uint: number;
@@ -29,9 +27,16 @@ export type Book = {
   parts: Array<Part>;
   progress?: Maybe<Progress>;
   reader: Scalars['String'];
-  state: Scalars['BookState'];
+  state: BookState;
   title: Scalars['String'];
 };
+
+export enum BookState {
+  Convert = 'convert',
+  Download = 'download',
+  Error = 'error',
+  Ready = 'ready'
+}
 
 export type BooksFilter = {
   search?: InputMaybe<Scalars['String']>;
@@ -45,8 +50,16 @@ export type Download = {
   length: Scalars['Int64'];
   magnet: Scalars['String'];
   name: Scalars['String'];
-  state: Scalars['DownloadState'];
+  state: DownloadState;
 };
+
+export enum DownloadState {
+  Delete = 'delete',
+  Done = 'done',
+  Error = 'error',
+  InProgress = 'in_progress',
+  New = 'new'
+}
 
 export type Jwt = {
   __typename?: 'JWT';
@@ -164,7 +177,7 @@ export enum Role {
 export type BooksQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type BooksQuery = { __typename?: 'Query', books: Array<{ __typename?: 'Book', id: number, title: string, author: string, reader: string, state: any, error?: string | null, download: { __typename?: 'Download', state: any, error?: string | null }, progress?: { __typename?: 'Progress', part: number, speed: number, position: number, updatedAt: Date } | null }> };
+export type BooksQuery = { __typename?: 'Query', books: Array<{ __typename?: 'Book', id: number, title: string, author: string, reader: string, state: BookState, error?: string | null, download: { __typename?: 'Download', state: DownloadState, error?: string | null }, progress?: { __typename?: 'Progress', part: number, speed: number, position: number, updatedAt: Date } | null }> };
 
 export type BookQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -243,7 +256,7 @@ export const BooksDocument = gql`
   })
   export class BooksGQL extends Apollo.Query<BooksQuery, BooksQueryVariables> {
     override document = BooksDocument;
-    
+
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -276,7 +289,7 @@ export const BookDocument = gql`
   })
   export class BookGQL extends Apollo.Query<BookQuery, BookQueryVariables> {
     override document = BookDocument;
-    
+
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -295,7 +308,7 @@ export const CreateBookDocument = gql`
   })
   export class CreateBookGQL extends Apollo.Mutation<CreateBookMutation, CreateBookMutationVariables> {
     override document = CreateBookDocument;
-    
+
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -311,7 +324,7 @@ export const LoginRequestDocument = gql`
   })
   export class LoginRequestGQL extends Apollo.Mutation<LoginRequestMutation, LoginRequestMutationVariables> {
     override document = LoginRequestDocument;
-    
+
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -331,7 +344,7 @@ export const LoginDocument = gql`
   })
   export class LoginGQL extends Apollo.Mutation<LoginMutation, LoginMutationVariables> {
     override document = LoginDocument;
-    
+
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -351,7 +364,7 @@ export const RefreshDocument = gql`
   })
   export class RefreshGQL extends Apollo.Mutation<RefreshMutation, RefreshMutationVariables> {
     override document = RefreshDocument;
-    
+
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -367,7 +380,7 @@ export const DeleteDocument = gql`
   })
   export class DeleteGQL extends Apollo.Mutation<DeleteMutation, DeleteMutationVariables> {
     override document = DeleteDocument;
-    
+
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -385,7 +398,7 @@ export const ProgressDocument = gql`
   })
   export class ProgressGQL extends Apollo.Mutation<ProgressMutation, ProgressMutationVariables> {
     override document = ProgressDocument;
-    
+
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }

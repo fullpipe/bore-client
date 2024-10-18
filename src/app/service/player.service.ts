@@ -1,14 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BookGQL, BookQuery } from 'src/generated/graphql';
 import { Howl } from 'howler';
-import {
-  BehaviorSubject,
-  Subject,
-  EMPTY,
-  Observable,
-  timer,
-  ReplaySubject,
-} from 'rxjs';
+import { EMPTY, Observable, timer, ReplaySubject } from 'rxjs';
 import { filter, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { StorageService } from './storage.service';
 import { ProgressService } from './progress.service';
@@ -38,7 +31,7 @@ export class PlayerService {
     private bookGql: BookGQL,
     private storage: StorageService,
     private progress: ProgressService,
-    private title: Title,
+    private title: Title
   ) {
     this.state$ = this.stateSubj.pipe(shareReplay(1));
     this.book$ = this.bookSubj.asObservable();
@@ -56,7 +49,7 @@ export class PlayerService {
             return EMPTY;
         }
       }),
-      shareReplay(1),
+      shareReplay(1)
     );
 
     this.timer$.subscribe(() => {
@@ -131,21 +124,23 @@ export class PlayerService {
     console.log(this.book);
     this.bookSubj.next(book);
 
-    this.parts = book.parts.map((p) => {
-      return {
-        howl: new Howl({
-          src: [environment.bookUrl + '/' + p.path],
-          html5: true,
-          preload: false,
-          autoplay: false,
-        }),
-        title: p.title,
-        duration: p.duration,
-      };
-    });
+    this.parts = book.parts.map((p) => ({
+      howl: new Howl({
+        src: [environment.bookUrl + '/' + p.path],
+        html5: true,
+        preload: false,
+        autoplay: false,
+      }),
+      title: p.title,
+      duration: p.duration,
+    }));
 
     const progress = await this.progress.getBookProgress(this.book.id);
     if (!progress) {
+      this.currentPartIdx = 0;
+      this.position = 0;
+      this.rate = 1;
+
       return;
     }
 
@@ -189,27 +184,10 @@ export class PlayerService {
     this.pubState();
   }
 
-  private preloadNext() {
-    if (!this.hasNextPart()) {
-      return;
-    }
-
-    const next = this.parts[this.currentPartIdx + 1];
-    if (next.howl.state() != 'unloaded') {
-      return;
-    }
-
-    next.howl.load();
-  }
-
   speed(speed: number) {
     this.rate = speed;
     this.cp.howl.rate(speed);
     this.pubState();
-  }
-
-  private hasNextPart() {
-    return this.currentPartIdx + 1 < this.parts.length;
   }
 
   nextPart() {
@@ -225,7 +203,7 @@ export class PlayerService {
   pause() {
     this.cp.howl.off();
     this.cp.howl.pause();
-    if (this.status == PlayerStatus.play) {
+    if (this.status === PlayerStatus.play) {
       this.position = this.cp.howl.seek();
     }
     this.control.next(PlayerStatus.pause);
@@ -288,6 +266,19 @@ export class PlayerService {
     this.pubState();
   }
 
+  private preloadNext() {
+    if (!this.hasNextPart()) {
+      return;
+    }
+
+    const next = this.parts[this.currentPartIdx + 1];
+    if (next.howl.state() !== 'unloaded') {
+      return;
+    }
+
+    next.howl.load();
+  }
+
   private saveState() {
     if (!this.book) {
       return;
@@ -301,6 +292,9 @@ export class PlayerService {
     });
   }
 
+  private hasNextPart() {
+    return this.currentPartIdx + 1 < this.parts.length;
+  }
   private async saveProgress() {
     if (!this.book) {
       return;

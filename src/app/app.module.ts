@@ -10,6 +10,8 @@ import { GraphQLModule } from './graphql.module';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from './service/auth.service';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [AppComponent],
@@ -20,6 +22,12 @@ import { AuthService } from './service/auth.service';
     GraphQLModule,
     HttpClientModule,
     FormsModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production,
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

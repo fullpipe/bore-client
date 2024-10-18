@@ -1,9 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { QueryRef } from 'apollo-angular';
-import { Observable, timer } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
-import { BooksGQL, BooksQuery, DeleteGQL } from 'src/generated/graphql';
+import {
+  BehaviorSubject,
+  combineLatest,
+  concat,
+  Observable,
+  OperatorFunction,
+  SchedulerLike,
+  timer,
+} from 'rxjs';
+import { debounceTime, map, publish, switchMap, take } from 'rxjs/operators';
+import {
+  BooksGQL,
+  BooksQuery,
+  BookState,
+  DeleteGQL,
+} from 'src/generated/graphql';
 import { AuthService } from '../service/auth.service';
 import { PlayerService } from '../service/player.service';
 
@@ -14,6 +27,9 @@ import { PlayerService } from '../service/player.service';
 })
 export class Tab2Page {
   books: Observable<BooksQuery['books']>;
+  bookState = BookState;
+  search = '';
+  searchQuery$ = new BehaviorSubject('');
 
   private query: QueryRef<BooksQuery>;
 
@@ -22,12 +38,36 @@ export class Tab2Page {
     private deleteGql: DeleteGQL,
     private player: PlayerService,
     private navCtl: NavController,
-    protected auth: AuthService,
+    protected auth: AuthService
   ) {
     this.query = booksGql.watch();
-    this.books = this.query.valueChanges.pipe(
-      map((result) => result.data.books),
+    this.books = combineLatest(
+      this.searchQuery$.pipe(debounceTime(100)),
+      this.query.valueChanges.pipe(map((result) => result.data.books))
+    ).pipe(
+      map((result) => {
+        const s = result[0].toLowerCase();
+
+        if (s === '') {
+          return result[1];
+        }
+
+        return result[1].filter((b) => {
+          if (b.title && b.title.toLowerCase().includes(s)) {
+            return true;
+          }
+          if (b.author && b.author.toLowerCase().includes(s)) {
+            return true;
+          }
+
+          return false;
+        });
+      })
     );
+  }
+
+  filter(f: string) {
+    this.searchQuery$.next(f);
   }
 
   bookID(_: number, book: BooksQuery['books'][0]): number {
@@ -40,7 +80,6 @@ export class Tab2Page {
   }
 
   async restart(bookID: number) {
-    console.log('restart', bookID);
     this.booksGql.watch().refetch();
   }
 

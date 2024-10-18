@@ -19,3 +19,9 @@ ion-range::part(pin) {
   font-family: monospace;
   top: -10px;
 }
+
+ion-list {
+  ion-item:last-child {
+    border-bottom: none;
+  }
+}
