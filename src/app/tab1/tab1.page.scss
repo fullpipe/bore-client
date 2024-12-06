@@ -21,7 +21,14 @@ ion-range::part(pin) {
 }
 
 ion-list {
-  ion-item:last-child {
-    border-bottom: none;
+  ion-item {
+    &.current {
+      // background-color: red;
+      --background: #ecf9ff;
+      // --ion-color-base: #ecf9ff;
+    }
+    &:last-child {
+      border-bottom: none;
+    }
   }
 }

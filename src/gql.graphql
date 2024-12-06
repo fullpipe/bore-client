@@ -10,12 +10,6 @@ query books {
       state
       error
     }
-    progress {
-      part
-      speed
-      position
-      updatedAt
-    }
   }
 }
 

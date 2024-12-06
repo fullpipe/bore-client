@@ -93,7 +93,16 @@
       </ion-button>
     </div>
     <ion-list lines="full">
-      <ion-item *ngFor="let part of book.parts; let i = index">
+      <ion-item
+        *ngFor="let part of book.parts; let i = index"
+        [class.current]="state.currentPart === i"
+        [appIntoView]="i + ''"
+      >
+        <span
+          *ngIf="state.currentPart === i"
+          (appIsVisible)="toggleCurrentPartOnScreen($event)"
+        ></span>
+
         <ion-button
           fill="clear"
           (click)="startPart(i)"
@@ -121,5 +130,19 @@
       </ion-item>
       <ion-item></ion-item>
     </ion-list>
+    <ion-fab
+      slot="fixed"
+      vertical="bottom"
+      horizontal="end"
+      *ngIf="!currentPartOnScreen"
+    >
+      <ion-fab-button
+        size="small"
+        color="secondary"
+        (click)="scrollToCurrentPart()"
+      >
+        <ion-icon name="arrow-down-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
   </ng-container>
 </ion-content>

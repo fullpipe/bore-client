@@ -14,7 +14,7 @@ const uri = environment.graphQLUrl;
 export const createApollo = (
   httpLink: HttpLink,
   auth: AuthService,
-  injector: Injector,
+  injector: Injector
 ) => {
   let pair: Pair | null = null;
 

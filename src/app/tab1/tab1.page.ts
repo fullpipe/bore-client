@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, QueryList, ViewChildren } from '@angular/core';
 import { ActionSheetController, RangeCustomEvent } from '@ionic/angular';
 import { BookQuery } from 'src/generated/graphql';
 import { PlayerService, PlayerStatus, State } from '../service/player.service';
 import { SleepService } from '../service/sleep.service';
+import { IntoViewDirective } from '../directive/intoView.directive';
 
 @Component({
   selector: 'app-tab1',
@@ -10,19 +11,21 @@ import { SleepService } from '../service/sleep.service';
   styleUrls: ['tab1.page.scss'],
 })
 export class Tab1Page {
+  @ViewChildren(IntoViewDirective) intoView: QueryList<IntoViewDirective>;
+
   state: State;
   book: BookQuery['book'] | null;
   playerStatus = PlayerStatus;
   beforeSeek: PlayerStatus;
+  currentPartOnScreen = true;
 
   constructor(
     private player: PlayerService,
     private sleep: SleepService,
-    private actionSheetCtrl: ActionSheetController,
+    private actionSheetCtrl: ActionSheetController
   ) {
     this.player.state$.subscribe((s) => (this.state = s));
     this.player.book$.subscribe((b) => {
-      console.log(b);
       this.book = b;
     });
   }
@@ -62,7 +65,7 @@ export class Tab1Page {
   }
 
   onIonKnobMoveEnd(ev: Event) {
-    if (this.beforeSeek == PlayerStatus.play) {
+    if (this.beforeSeek === PlayerStatus.play) {
       this.player.play();
     } else {
       this.player.pause();
@@ -162,6 +165,17 @@ export class Tab1Page {
 
   timeLeft(): string {
     return this.formatTime(this.state.duration - this.state.position);
+  }
+
+  toggleCurrentPartOnScreen(on: boolean) {
+    this.currentPartOnScreen = on;
+  }
+
+  scrollToCurrentPart(id: string) {
+    const item = this.intoView.find(
+      (x) => x.key === this.state.currentPart + ''
+    );
+    item.scrollIntoView();
   }
 
   formatTime(time: number): string {
