@@ -8,6 +8,10 @@ export class IntoViewDirective {
   constructor(private el: ElementRef<HTMLElement>) {}
 
   public scrollIntoView() {
-    this.el.nativeElement.scrollIntoView({ behavior: 'smooth' });
+    this.el.nativeElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'center',
+    });
   }
 }
