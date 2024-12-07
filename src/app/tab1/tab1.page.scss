@@ -23,9 +23,10 @@ ion-range::part(pin) {
 ion-list {
   ion-item {
     &.current {
-      // background-color: red;
       --background: #ecf9ff;
-      // --ion-color-base: #ecf9ff;
+      @media (prefers-color-scheme: dark) {
+        --background: #323435;
+      }
     }
     &:last-child {
       border-bottom: none;

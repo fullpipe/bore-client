@@ -171,7 +171,7 @@ export class Tab1Page {
     this.currentPartOnScreen = on;
   }
 
-  scrollToCurrentPart(id: string) {
+  scrollToCurrentPart() {
     const item = this.intoView.find(
       (x) => x.key === this.state.currentPart + ''
     );
