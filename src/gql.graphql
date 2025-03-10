@@ -13,19 +13,24 @@ query books {
   }
 }
 
-query book($id: ID!) {
+query bookProgress($id: ID!) {
   book(id: $id) {
     id
-    title
-    author
-    reader
-
     progress {
       part
       speed
       position
       updatedAt
     }
+  }
+}
+
+query book($id: ID!) {
+  book(id: $id) {
+    id
+    title
+    author
+    reader
 
     parts {
       title
@@ -36,9 +41,14 @@ query book($id: ID!) {
   }
 }
 
-mutation createBook($input: NewBookInput!) {
-  createBook(input: $input) {
+mutation bookCreate($input: NewBookInput!) {
+  bookCreate(input: $input) {
     title
+    id
+  }
+}
+mutation bookUpdate($id: ID!, $input: BookInput!) {
+  bookUpdate(id: $id, input: $input) {
     id
   }
 }

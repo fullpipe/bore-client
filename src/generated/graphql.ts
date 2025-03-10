@@ -13,9 +13,13 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  Any: any;
   Int64: any;
+  JSON: any;
   Time: Date;
+  UUID: any;
   Uint: number;
+  Upload: any;
 };
 
 export type Book = {
@@ -28,6 +32,12 @@ export type Book = {
   progress?: Maybe<Progress>;
   reader: Scalars['String'];
   state: BookState;
+  title: Scalars['String'];
+};
+
+export type BookInput = {
+  author: Scalars['String'];
+  reader: Scalars['String'];
   title: Scalars['String'];
 };
 
@@ -79,7 +89,8 @@ export type LoginRequestInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createBook: Book;
+  bookCreate: Book;
+  bookUpdate: Book;
   delete: Scalars['Boolean'];
   login: Jwt;
   loginRequest: Scalars['ID'];
@@ -89,8 +100,14 @@ export type Mutation = {
 };
 
 
-export type MutationCreateBookArgs = {
+export type MutationBookCreateArgs = {
   input: NewBookInput;
+};
+
+
+export type MutationBookUpdateArgs = {
+  id: Scalars['ID'];
+  input: BookInput;
 };
 
 
@@ -179,19 +196,34 @@ export type BooksQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type BooksQuery = { __typename?: 'Query', books: Array<{ __typename?: 'Book', id: number, title: string, author: string, reader: string, state: BookState, error?: string | null, download: { __typename?: 'Download', state: DownloadState, error?: string | null } }> };
 
+export type BookProgressQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type BookProgressQuery = { __typename?: 'Query', book?: { __typename?: 'Book', id: number, progress?: { __typename?: 'Progress', part: number, speed: number, position: number, updatedAt: Date } | null } | null };
+
 export type BookQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type BookQuery = { __typename?: 'Query', book?: { __typename?: 'Book', id: number, title: string, author: string, reader: string, progress?: { __typename?: 'Progress', part: number, speed: number, position: number, updatedAt: Date } | null, parts: Array<{ __typename?: 'Part', title: string, possition: number, path: string, duration: number }> } | null };
+export type BookQuery = { __typename?: 'Query', book?: { __typename?: 'Book', id: number, title: string, author: string, reader: string, parts: Array<{ __typename?: 'Part', title: string, possition: number, path: string, duration: number }> } | null };
 
-export type CreateBookMutationVariables = Exact<{
+export type BookCreateMutationVariables = Exact<{
   input: NewBookInput;
 }>;
 
 
-export type CreateBookMutation = { __typename?: 'Mutation', createBook: { __typename?: 'Book', title: string, id: number } };
+export type BookCreateMutation = { __typename?: 'Mutation', bookCreate: { __typename?: 'Book', title: string, id: number } };
+
+export type BookUpdateMutationVariables = Exact<{
+  id: Scalars['ID'];
+  input: BookInput;
+}>;
+
+
+export type BookUpdateMutation = { __typename?: 'Mutation', bookUpdate: { __typename?: 'Book', id: number } };
 
 export type LoginRequestMutationVariables = Exact<{
   input: LoginRequestInput;
@@ -255,6 +287,30 @@ export const BooksDocument = gql`
       super(apollo);
     }
   }
+export const BookProgressDocument = gql`
+    query bookProgress($id: ID!) {
+  book(id: $id) {
+    id
+    progress {
+      part
+      speed
+      position
+      updatedAt
+    }
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class BookProgressGQL extends Apollo.Query<BookProgressQuery, BookProgressQueryVariables> {
+    override document = BookProgressDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
 export const BookDocument = gql`
     query book($id: ID!) {
   book(id: $id) {
@@ -262,12 +318,6 @@ export const BookDocument = gql`
     title
     author
     reader
-    progress {
-      part
-      speed
-      position
-      updatedAt
-    }
     parts {
       title
       possition
@@ -288,9 +338,9 @@ export const BookDocument = gql`
       super(apollo);
     }
   }
-export const CreateBookDocument = gql`
-    mutation createBook($input: NewBookInput!) {
-  createBook(input: $input) {
+export const BookCreateDocument = gql`
+    mutation bookCreate($input: NewBookInput!) {
+  bookCreate(input: $input) {
     title
     id
   }
@@ -300,8 +350,26 @@ export const CreateBookDocument = gql`
   @Injectable({
     providedIn: 'root'
   })
-  export class CreateBookGQL extends Apollo.Mutation<CreateBookMutation, CreateBookMutationVariables> {
-    override document = CreateBookDocument;
+  export class BookCreateGQL extends Apollo.Mutation<BookCreateMutation, BookCreateMutationVariables> {
+    override document = BookCreateDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const BookUpdateDocument = gql`
+    mutation bookUpdate($id: ID!, $input: BookInput!) {
+  bookUpdate(id: $id, input: $input) {
+    id
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class BookUpdateGQL extends Apollo.Mutation<BookUpdateMutation, BookUpdateMutationVariables> {
+    override document = BookUpdateDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);

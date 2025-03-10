@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
-import { CreateBookGQL } from 'src/generated/graphql';
+import { BookCreateGQL } from 'src/generated/graphql';
 
 @Component({
   selector: 'app-book-new',
@@ -12,8 +12,8 @@ export class BookNewComponent implements OnInit {
   loading = false;
 
   constructor(
-    private createBookGql: CreateBookGQL,
-    private nav: NavController,
+    private createBookGql: BookCreateGQL,
+    private nav: NavController
   ) {}
 
   ngOnInit() {}

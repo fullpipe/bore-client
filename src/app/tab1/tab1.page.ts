@@ -179,15 +179,28 @@ export class Tab1Page {
   }
 
   formatTime(time: number): string {
-    const minutes = Math.floor(time / 60);
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor(time / 60 - hours * 60);
     const seconds = Math.ceil(time - minutes * 60);
 
-    return `${minutes.toLocaleString('en-US', {
-      minimumIntegerDigits: 2,
-      useGrouping: false,
-    })}:${seconds.toLocaleString('en-US', {
-      minimumIntegerDigits: 2,
-      useGrouping: false,
-    })}`;
+    let t = '';
+    if (hours > 0) {
+      t +=
+        hours.toLocaleString('en-US', {
+          minimumIntegerDigits: 2,
+          useGrouping: false,
+        }) + ':';
+    }
+
+    return (
+      t +
+      `${minutes.toLocaleString('en-US', {
+        minimumIntegerDigits: 2,
+        useGrouping: false,
+      })}:${seconds.toLocaleString('en-US', {
+        minimumIntegerDigits: 2,
+        useGrouping: false,
+      })}`
+    );
   }
 }

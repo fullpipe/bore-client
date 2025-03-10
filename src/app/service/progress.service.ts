@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BookGQL, ProgressGQL, ProgressInput } from 'src/generated/graphql';
+import { BookProgressGQL, ProgressGQL } from 'src/generated/graphql';
 import { AuthService } from './auth.service';
 import { StorageService } from './storage.service';
 
@@ -9,16 +9,17 @@ import { StorageService } from './storage.service';
 export class ProgressService {
   private logedIn = false;
   private collection: ProgressCollection;
+
   constructor(
     private storage: StorageService,
     private progressGql: ProgressGQL,
     private auth: AuthService,
-    private bookGql: BookGQL,
+    private bookGql: BookProgressGQL
   ) {
     this.auth.logedIn$.subscribe((l) => (this.logedIn = l));
     this.collection = this.storage.get<ProgressCollection>(
       'ProgressCollection',
-      {},
+      {}
     );
   }
 
@@ -39,7 +40,7 @@ export class ProgressService {
   }
 
   async getBookProgress(
-    bookID: number,
+    bookID: number
   ): Promise<Omit<Progress, 'bookID' | 'updatedAt'>> {
     const progress = this.collection[bookID] || null;
 

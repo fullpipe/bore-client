@@ -1,16 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { QueryRef } from 'apollo-angular';
-import {
-  BehaviorSubject,
-  combineLatest,
-  concat,
-  Observable,
-  OperatorFunction,
-  SchedulerLike,
-  timer,
-} from 'rxjs';
-import { debounceTime, map, publish, switchMap, take } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { debounceTime, map } from 'rxjs/operators';
 import {
   BooksGQL,
   BooksQuery,
@@ -41,10 +33,10 @@ export class Tab2Page {
     protected auth: AuthService
   ) {
     this.query = booksGql.watch();
-    this.books = combineLatest(
+    this.books = combineLatest([
       this.searchQuery$.pipe(debounceTime(100)),
-      this.query.valueChanges.pipe(map((result) => result.data.books))
-    ).pipe(
+      this.query.valueChanges.pipe(map((result) => result.data.books)),
+    ]).pipe(
       map((result) => {
         const s = result[0].toLowerCase();
 
