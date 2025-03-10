@@ -5,7 +5,7 @@ metadata:
   labels:
     app: bore-client
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: bore-client
@@ -18,10 +18,6 @@ spec:
         - name: bore-client
           image: registry.gitlab.com/fullpipe/registry/bore-client:latest
           imagePullPolicy: Always
-          resources:
-            limits:
-              cpu: "50m"
-              memory: "64Mi"
       imagePullSecrets:
         - name: gitlab-registry-secret
 ---
