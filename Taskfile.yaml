@@ -1,0 +1,13 @@
+version: "3"
+
+env:
+  IMAGE_PATH: registry.gitlab.com/fullpipe/registry/bore-client
+
+tasks:
+  gen: npm run codegen
+  build: docker build --platform=linux/amd64 --target release -t $IMAGE_PATH .
+  push: docker push $IMAGE_PATH:latest
+  deploy:
+    - task: build
+    - task: push
+  dev: npm start
