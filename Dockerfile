@@ -1,7 +1,5 @@
 # syntax = docker.io/docker/dockerfile:experimental
-
-# Use official node image as the base image
-FROM node:lts-slim as build
+FROM fullpipe/node:lts AS build
 
 ARG environment=production
 
@@ -17,9 +15,5 @@ COPY . .
 # Generate the build of the application
 RUN npm run build -- --configuration=production
 
-FROM caddy:alpine as release
-
-EXPOSE 8080
-COPY  Caddyfile /etc/caddy/Caddyfile
-
+FROM fullpipe/web-app:latest AS release
 COPY --from=build /app/www /app

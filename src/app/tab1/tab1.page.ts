@@ -180,8 +180,12 @@ export class Tab1Page {
 
   formatTime(time: number): string {
     const hours = Math.floor(time / 3600);
-    const minutes = Math.floor(time / 60 - hours * 60);
-    const seconds = Math.ceil(time - minutes * 60);
+    time -= hours * 60 * 60;
+
+    const minutes = Math.floor(time / 60);
+    time -= minutes * 60;
+
+    const seconds = time;
 
     let t = '';
     if (hours > 0) {
