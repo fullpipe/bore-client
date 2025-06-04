@@ -185,7 +185,7 @@ export class Tab1Page {
     const minutes = Math.floor(time / 60);
     time -= minutes * 60;
 
-    const seconds = time;
+    const seconds = Math.floor(time);
 
     let t = '';
     if (hours > 0) {
